@@ -1,7 +1,7 @@
 name: DynamicMarket
 main: com.gmail.haloinverse.DynamicMarket.DynamicMarket
-version: 0.4.8
-author: HaloInverse
+version: 0.4.8.1
+authors: [HaloInverse, Nijikokun]
 description: >
              A shop plugin building towards an interesting and flexible market system.
 commands:
