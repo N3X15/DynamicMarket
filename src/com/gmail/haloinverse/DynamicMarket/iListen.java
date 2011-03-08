@@ -5,8 +5,8 @@ import com.gmail.haloinverse.DynamicMarket.DynamicMarket.EconType;
 //import com.haloinverse.AnyConomy.Exceptions.*;
 
 import com.nijikokun.bukkit.Permissions.Permissions;
-import com.nijikokun.bukkit.iConomy.iConomy;
-import com.nijikokun.bukkit.iConomy.Account;
+import com.nijiko.coelho.iConomy.iConomy;
+import com.nijiko.coelho.iConomy.system.Account;
 import java.util.ArrayList;
 //import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -442,7 +442,7 @@ public class iListen extends PlayerListener
 			//if (plugin.econType == EconType.ICONOMY2)
 			//	return iConomy.db.get_balance(name);
 			if (plugin.econType == EconType.ICONOMY3)
-				return (int)iConomy.Bank.getAccount(name).getBalance();
+				return (int)iConomy.getBank().getAccount(name).getBalance();
 			
 			/*
 			if (plugin.econType == EconType.ANYCONOMY)
@@ -505,7 +505,7 @@ public class iListen extends PlayerListener
 			//	iConomy.db.set_balance(name, get_balance(name) + amount);
 			if (plugin.econType == EconType.ICONOMY3)
 			{
-				Account thisAccount = iConomy.Bank.getAccount(name); 
+				Account thisAccount = iConomy.getBank().getAccount(name); 
 				thisAccount.add(amount);
 				thisAccount.save();
 			}

@@ -1,6 +1,6 @@
 package com.gmail.haloinverse.DynamicMarket;
 
-import com.nijikokun.bukkit.iConomy.iConomy;
+import com.nijiko.coelho.iConomy.iConomy;
 import java.lang.Math;
 import java.util.ArrayList;
 //import java.sql.ResultSet;
@@ -682,7 +682,7 @@ public class MarketItem extends ItemClump {
 		if (!getCanBuy(numBundles))
 			return ("{PRM}"+getName() + "{ERR} has only {PRM}" + formatBundleCount(leftToBuy()) + " {ERR}left for sale.");
 		// Display count as [<bundle>(x<numbundles>)]
-		return ("{}Buy: {BKT}[{PRM}" + formatBundleCount(numBundles) + "{BKT}]{} for {PRM}" + getBuyPrice(numBundles) + " " + iConomy.currency);
+		return ("{}Buy: {BKT}[{PRM}" + formatBundleCount(numBundles) + "{BKT}]{} for {PRM}" + getBuyPrice(numBundles) + " " + iConomy.getBank().getCurrency());
 		//TODO: Abstract currency name from iConomy reference.
 	}
 	
@@ -697,7 +697,7 @@ public class MarketItem extends ItemClump {
 		if (!getCanSell(numBundles))
 			return ("{PRM}"+getName() + "{ERR} is overstocked, only {PRM}" + formatBundleCount(leftToSell()) + " {ERR}can be sold.");
 		// Display count as [<bundle>(x<numbundles>)]
-		return ("{}Sell: {BKT}[{PRM}" + formatBundleCount(numBundles) + "{BKT}]{} for {PRM}" + getSellPrice(numBundles) + " " + iConomy.currency);
+		return ("{}Sell: {BKT}[{PRM}" + formatBundleCount(numBundles) + "{BKT}]{} for {PRM}" + getSellPrice(numBundles) + " " + iConomy.getBank().getCurrency());
 		//TODO: Abstract currency name from iConomy reference.
 	}
 

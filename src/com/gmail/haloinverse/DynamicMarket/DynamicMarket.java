@@ -2,7 +2,7 @@ package com.gmail.haloinverse.DynamicMarket;
 
 
 import com.nijikokun.bukkit.Permissions.Permissions;
-import com.nijikokun.bukkit.iConomy.iConomy;
+import com.nijiko.coelho.iConomy.iConomy;
 //import com.haloinverse.AnyConomy.AnyConomy;
 import java.io.File;
 import java.util.Timer;
@@ -111,7 +111,7 @@ public class DynamicMarket extends JavaPlugin
 	private void registerEvents()
 	{
 		PluginManager thisPluginManager = getServer().getPluginManager();
-		thisPluginManager.registerEvent(Event.Type.PLAYER_COMMAND, this.playerListener, Event.Priority.Normal, this);
+		thisPluginManager.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, this.playerListener, Event.Priority.Normal, this);
 		thisPluginManager.registerEvent(Event.Type.PLUGIN_ENABLE, this.myServerListener, Event.Priority.Monitor, this);
 	}
 
@@ -277,8 +277,10 @@ public class DynamicMarket extends JavaPlugin
 	public void connectToiConomy(iConomy thisPlugin)
 	{
 		iC = thisPlugin;
-		currency = iConomy.currency;
-		econLoaded = true;
+		if ( iConomy.getBank() != null ) {
+			currency = iConomy.getBank().getCurrency();
+			econLoaded = true;
+		}
 		log.info(Messaging.bracketize(name) + " iConomy connected.");
 	}
 	

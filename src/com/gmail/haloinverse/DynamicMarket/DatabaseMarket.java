@@ -82,11 +82,12 @@ public class DatabaseMarket extends DatabaseCore
 					"driftin INT NOT NULL, " +
 					"avgstock INT NOT NULL, " +
 					"class INT NOT NULL, " +
-					"shoplabel TEXT NOT NULL DEFAULT '');" +
-					"CREATE INDEX itemIndex ON Market (item);" +
-					"CREATE INDEX subtypeIndex ON Market (subtype);" +
-					"CREATE INDEX nameIndex ON Market (name);" +
-					"CREATE INDEX shoplabelIndex ON Market (shoplabel)");
+					"shoplabel TEXT NOT NULL DEFAULT '');" //+
+//					"CREATE INDEX itemIndex ON Market (item);" +
+//					"CREATE INDEX subtypeIndex ON Market (subtype);" +
+//					"CREATE INDEX nameIndex ON Market (name);" +
+//					"CREATE INDEX shoplabelIndex ON Market (shoplabel)"
+					);
 		else
 			myQuery.executeStatement("CREATE TABLE " + tableName + " ( id INT( 255 ) NOT NULL AUTO_INCREMENT, " +
 					"item INT NOT NULL, " +
