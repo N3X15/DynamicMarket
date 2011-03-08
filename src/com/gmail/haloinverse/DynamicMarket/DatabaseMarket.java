@@ -28,6 +28,17 @@ public class DatabaseMarket extends DatabaseCore
 		super(database, tableAccessed, thisEngine, pluginRef);
 		this.itemsReference = null;
 	}
+
+	protected void checkColumn(String columnName, String columnDef, String index) {
+		SQLHandler myQuery = new SQLHandler(this);
+		if (!myQuery.checkColumnExists(tableName, columnName))
+		{
+			myQuery.prepareStatement("ALTER TABLE " + tableName + " ADD " + columnName + " " + columnDef);
+			myQuery.prepareStatement(index);
+			myQuery.executeUpdates();			
+		}
+		myQuery.close();
+	}
 	
 	protected void checkColumn(String columnName, String columnDef)
 	{
@@ -43,8 +54,8 @@ public class DatabaseMarket extends DatabaseCore
 	protected void checkNewFields()
 	{
 		checkColumn("shoplabel", (this.databaseType.equals(Type.SQLITE)?
-				"TEXT NOT NULL DEFAULT ''; CREATE INDEX shoplabelIndex ON Market (shoplabel)"
-				: "CHAR(20) NOT NULL DEFAULT ''; CREATE INDEX shopLabelIndex ON Market (shopLabel)"));
+				"TEXT NOT NULL DEFAULT '';"
+				: "CHAR(20) NOT NULL DEFAULT ''"), "CREATE INDEX shoplabelIndex ON Market (shoplabel)" );
 	}
 	
 	protected boolean createTable(String shopLabel)
@@ -54,7 +65,7 @@ public class DatabaseMarket extends DatabaseCore
 			createTable();
 		else
 			return false;
-		return add(new MarketItem("-1,-1 n:Default", null, this, shopLabel));
+		return add(new MarketItem("-1,-1 n:Default", new MarketItem(), this, shopLabel));
 	}
 	
 	protected boolean createTable() {
@@ -82,11 +93,11 @@ public class DatabaseMarket extends DatabaseCore
 					"driftin INT NOT NULL, " +
 					"avgstock INT NOT NULL, " +
 					"class INT NOT NULL, " +
-					"shoplabel TEXT NOT NULL DEFAULT '');" //+
-//					"CREATE INDEX itemIndex ON Market (item);" +
-//					"CREATE INDEX subtypeIndex ON Market (subtype);" +
-//					"CREATE INDEX nameIndex ON Market (name);" +
-//					"CREATE INDEX shoplabelIndex ON Market (shoplabel)"
+					"shoplabel TEXT NOT NULL DEFAULT '');" +
+					"CREATE INDEX itemIndex ON Market (item);" +
+					"CREATE INDEX subtypeIndex ON Market (subtype);" +
+					"CREATE INDEX nameIndex ON Market (name);" +
+					"CREATE INDEX shoplabelIndex ON Market (shoplabel)"
 					);
 		else
 			myQuery.executeStatement("CREATE TABLE " + tableName + " ( id INT( 255 ) NOT NULL AUTO_INCREMENT, " +

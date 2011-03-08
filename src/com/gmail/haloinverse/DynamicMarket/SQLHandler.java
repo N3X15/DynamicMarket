@@ -160,8 +160,11 @@ public class SQLHandler {
 			}
 			if (!psList.isEmpty())
 			{
-				for(PreparedStatement thisPs : psList)
+				for(PreparedStatement thisPs : psList) {
+					ps = thisPs;
 					thisPs.executeUpdate();
+				}
+				ps = null;
 				// Clear list once finished execution.
 				psList.clear();
 				conn.commit();
