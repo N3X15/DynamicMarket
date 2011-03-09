@@ -10,9 +10,7 @@ import java.sql.Statement;
 
 public class SQLHandler {
 
-    // A wrapper class to handle the repeated grunt-work of SQL queries and the
-    // errors they throw.
-
+    // A wrapper class to handle the repeated grunt-work of SQL queries and the errors they throw.
     public Connection conn;
     public PreparedStatement ps;
     private ArrayList<PreparedStatement> psList;
@@ -31,14 +29,11 @@ public class SQLHandler {
             conn = connDB.connection();
             conn.setAutoCommit(false);
         } catch (ClassNotFoundException ex) {
-            connDB.logSevereException("Database connector not found for "
-                    + connDB.dbTypeString(), ex);
+            connDB.logSevereException("Database connector not found for " + connDB.dbTypeString(), ex);
             conn = null;
             isOK = false;
         } catch (SQLException ex) {
-            connDB.logSevereException(
-                    "SQL Error connecting to " + connDB.dbTypeString()
-                            + "database", ex);
+            connDB.logSevereException("SQL Error connecting to " + connDB.dbTypeString() + "database", ex);
             conn = null;
             isOK = false;
         }
@@ -49,6 +44,7 @@ public class SQLHandler {
     public void prepareStatement(String sqlString) {
         try {
             // Store previous prepareStatement, if one was already prepared.
+            
             if (ps != null) {
                 psList.add(ps);
                 ps = null;
@@ -68,9 +64,7 @@ public class SQLHandler {
                 inputList.clear();
             }
         } catch (SQLException ex) {
-            // TODO Auto-generated catch block
-            connDB.logSevereException("Error preparing query statement ["
-                    + sqlString + "] for " + connDB.dbTypeString(), ex);
+            connDB.logSevereException("Error preparing query statement [" + sqlString + "] for " + connDB.dbTypeString(), ex);
             ps = null;
             isOK = false;
         }
@@ -78,8 +72,7 @@ public class SQLHandler {
 
     public void prepareBatchStatement(String sqlString) {
         // Takes the sqlString, and creates a preparedStatement.
-        // Unlike prepareStatement, this does NOT read the parameters already
-        // entered into inputList.
+        // Unlike prepareStatement, this does NOT read the parameters already entered into inputList.
         // The inputList is instead read by addToBatch.
         try {
             // Store previous prepareStatement, if one was already prepared.
@@ -96,24 +89,19 @@ public class SQLHandler {
                 // inputList.clear();
             }
         } catch (SQLException ex) {
-            connDB.logSevereException("Error preparing query statement ["
-                    + sqlString + "] for " + connDB.dbTypeString(), ex);
+            connDB.logSevereException("Error preparing query statement [" + sqlString + "] for " + connDB.dbTypeString(), ex);
             ps = null;
             isOK = false;
         }
     }
 
     public void addToBatch() {
-        // Add the current inputList to the current (batch)preparedStatement as
-        // a batch item.
+        // Add the current inputList to the current (batch)preparedStatement as a batch item.
         for (int i = 1; i <= inputList.size(); ++i) {
             try {
                 ps.setObject(i, inputList.get(i - 1));
             } catch (SQLException ex) {
-                connDB.logSevereException(
-                        "Error adding [" + inputList.get(i - 1)
-                                + "] to batch in position " + i + " for "
-                                + connDB.dbTypeString(), ex);
+                connDB.logSevereException("Error adding [" + inputList.get(i - 1) + "] to batch in position " + i + " for " + connDB.dbTypeString(), ex);
                 ps = null;
                 isOK = false;
                 break;
@@ -122,9 +110,7 @@ public class SQLHandler {
         try {
             ps.addBatch();
         } catch (SQLException ex) {
-            connDB.logSevereException(
-                    "Error adding completed batch to PreparedStatement for "
-                            + connDB.dbTypeString(), ex);
+            connDB.logSevereException("Error adding completed batch to PreparedStatement for " + connDB.dbTypeString(), ex);
             ps = null;
             isOK = false;
         }
@@ -132,8 +118,7 @@ public class SQLHandler {
     }
 
     public void executeQuery() {
-        // Executes only the most recent preparedStatement, AND returns the
-        // result.
+        // Executes only the most recent preparedStatement, AND returns the result.
         // Clears the preparedStatement after use.
         try {
             rs = null;
@@ -143,9 +128,7 @@ public class SQLHandler {
                 ps = null;
             }
         } catch (SQLException ex) {
-            connDB.logSevereException(
-                    "Error executing query statement [" + ps.toString()
-                            + "] with " + connDB.dbTypeString(), ex);
+            connDB.logSevereException("Error executing query statement [" + ps.toString() + "] with " + connDB.dbTypeString(), ex);
             rs = null;
             isOK = false;
         }
@@ -170,9 +153,7 @@ public class SQLHandler {
                 conn.commit();
             }
         } catch (SQLException ex) {
-            connDB.logSevereException(
-                    "Error executing update statement [" + ps.toString()
-                            + "] with " + connDB.dbTypeString(), ex);
+            connDB.logSevereException("Error executing update statement [" + ps.toString() + "] with " + connDB.dbTypeString(), ex);
             isOK = false;
         }
     }
@@ -185,58 +166,54 @@ public class SQLHandler {
                 st.executeUpdate(sqlStatement);
                 conn.commit();
             } catch (SQLException ex) {
-                connDB.logSevereException("Error executing statement ["
-                        + sqlStatement + "] with " + connDB.dbTypeString(), ex);
+                connDB.logSevereException("Error executing statement [" + sqlStatement + "] with " + connDB.dbTypeString(), ex);
                 isOK = false;
             } finally {
-                if (st != null)
+                if (st != null) {
                     try {
                         st.close();
                     } catch (SQLException ex) {
-                        connDB.logSevereException(
-                                "Error closing statement [" + sqlStatement
-                                        + "] with " + connDB.dbTypeString(), ex);
+                        connDB.logSevereException("Error closing statement [" + sqlStatement + "] with " + connDB.dbTypeString(), ex);
                         isOK = false;
                     }
+                }
             }
         }
     }
 
     public boolean checkTable(String tableName) {
         boolean bool = false;
-        if (conn != null)
+        if (conn != null) {
             try {
                 DatabaseMetaData dbm = conn.getMetaData();
                 rs = dbm.getTables(null, null, tableName, null);
                 bool = rs.next();
                 return bool;
             } catch (SQLException ex) {
-                connDB.logSevereException(
-                        "Table check for " + connDB.dbTypeString() + " Failed",
-                        ex);
+                connDB.logSevereException("Table check for " + connDB.dbTypeString() + " Failed", ex);
                 isOK = false;
                 bool = false;
                 return bool;
             }
+        }
         return bool;
     }
 
     public boolean checkColumnExists(String tableName, String columnName) {
         boolean bool = false;
-        if (conn != null)
+        if (conn != null) {
             try {
                 DatabaseMetaData dbm = conn.getMetaData();
                 rs = dbm.getColumns(null, null, tableName, columnName);
                 bool = rs.next();
                 return bool;
             } catch (SQLException ex) {
-                connDB.logSevereException(
-                        "Column check for " + connDB.dbTypeString() + " Failed",
-                        ex);
+                connDB.logSevereException("Column check for " + connDB.dbTypeString() + " Failed", ex);
                 isOK = false;
                 bool = false;
                 return bool;
             }
+        }
         return bool;
     }
 
@@ -244,8 +221,7 @@ public class SQLHandler {
         try {
             return rs.getInt(fieldName);
         } catch (SQLException ex) {
-            connDB.logSevereException("getInt '" + fieldName + "' with "
-                    + connDB.dbTypeString() + " Failed", ex);
+            connDB.logSevereException("getInt '" + fieldName + "' with " + connDB.dbTypeString() + " Failed", ex);
             isOK = false;
             return 0;
         }
@@ -255,39 +231,37 @@ public class SQLHandler {
         try {
             return rs.getString(fieldName);
         } catch (SQLException ex) {
-            connDB.logSevereException("getString '" + fieldName + "' with "
-                    + connDB.dbTypeString() + " Failed", ex);
+            connDB.logSevereException("getString '" + fieldName + "' with " + connDB.dbTypeString() + " Failed", ex);
             isOK = false;
             return null;
         }
     }
 
     public void close() {
-        if (rs != null)
+        if (rs != null) {
             try {
                 rs.close();
             } catch (SQLException ex) {
-                connDB.logSevereException("SQL error closing resultset for "
-                        + connDB.dbTypeString() + "database", ex);
+                connDB.logSevereException("SQL error closing resultset for " + connDB.dbTypeString() + "database", ex);
                 isOK = false;
             }
-        if (ps != null)
+        }
+        if (ps != null) {
             try {
                 ps.close();
             } catch (SQLException ex) {
-                connDB.logSevereException(
-                        "SQL error closing prepared statement for "
-                                + connDB.dbTypeString() + "database", ex);
+                connDB.logSevereException("SQL error closing prepared statement for " + connDB.dbTypeString() + "database", ex);
                 isOK = false;
             }
-        // if (conn != null)
-        // try {
-        // conn.close();
-        // } catch (SQLException ex) {
-        // connDB.logSevereException("SQL error closing connection for " +
-        // connDB.dbTypeString() + "database", ex);
-        // isOK = false;
-        // }
+        }
+//        if (conn != null) {
+//            try {
+//                conn.close();
+//            } catch (SQLException ex) {
+//                connDB.logSevereException("SQL error closing connection for " + connDB.dbTypeString() + "database", ex);
+//                isOK = false;
+//            }
+//        }
     }
 
     protected void finalize() throws Throwable {

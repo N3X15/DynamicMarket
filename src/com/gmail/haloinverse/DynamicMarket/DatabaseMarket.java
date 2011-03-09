@@ -15,8 +15,7 @@ public class DatabaseMarket extends DatabaseCore {
 
     public DatabaseMarket(Type database, String tableAccessed, Items itemsRef,
             String thisEngine, DynamicMarket pluginRef) {
-        super(database, tableAccessed, thisEngine, pluginRef); // default table
-                                                               // name: "Market"
+        super(database, tableAccessed, thisEngine, pluginRef); // default table name: "Market"
         checkNewFields();
         this.itemsReference = itemsRef;
     }
@@ -215,10 +214,8 @@ public class DatabaseMarket extends DatabaseCore {
         return list(pageNum, null, "");
     }
 
-    public ArrayList<MarketItem> list(int pageNum, String nameFilter,
-            String shopLabel) {
-        // CHANGED: This now spits out a list of MarketItems, instead of a list
-        // of arrays of ints.
+    public ArrayList<MarketItem> list(int pageNum, String nameFilter, String shopLabel) {
+        //CHANGED: This now spits out a list of MarketItems, instead of a list of arrays of ints.
         // If pageNum=0, return the entire list.
         // Optionally filters by partial-string matching of names.
 
@@ -264,8 +261,7 @@ public class DatabaseMarket extends DatabaseCore {
                     data.add(newItem);
                 }
             } catch (SQLException ex) {
-                logSevereException("SQL Error during ArrayList fetch: "
-                        + dbTypeString(), ex);
+                logSevereException("SQL Error during ArrayList fetch: " + dbTypeString(), ex);
             }
 
         myQuery.close();
@@ -309,8 +305,7 @@ public class DatabaseMarket extends DatabaseCore {
                     // SQLExceptions.
                 }
         } catch (SQLException ex) {
-            logSevereException("Error retrieving shop item data with "
-                    + dbTypeString(), ex);
+            logSevereException("Error retrieving shop item data with " + dbTypeString(), ex);
             fetchedData = null;
         }
 
@@ -338,8 +333,7 @@ public class DatabaseMarket extends DatabaseCore {
         myQuery.inputList.add(thisItem.itemId);
         myQuery.inputList.add(thisItem.subType);
         myQuery.inputList.add(shopLabel);
-        myQuery.prepareStatement("SELECT * FROM " + tableName
-                + " WHERE (item = ? AND subtype = ? AND shoplabel = ?) LIMIT 1");
+        myQuery.prepareStatement("SELECT * FROM " + tableName + " WHERE (item = ? AND subtype = ? AND shoplabel = ?) LIMIT 1");
 
         myQuery.executeQuery();
 

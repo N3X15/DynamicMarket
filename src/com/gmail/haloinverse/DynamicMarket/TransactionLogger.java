@@ -12,8 +12,7 @@ public class TransactionLogger {
     public boolean autoFlush;
     public boolean isOK;
 
-    public TransactionLogger(DynamicMarket thisPlugin, String fileName,
-            boolean setAutoFlush) {
+    public TransactionLogger(DynamicMarket thisPlugin, String fileName, boolean setAutoFlush) {
         this.isOK = true;
         this.plugin = thisPlugin;
         this.logFileName = fileName;
@@ -25,36 +24,36 @@ public class TransactionLogger {
         try {
             logWriter = new BufferedWriter(new FileWriter(logFileName, true));
         } catch (IOException ex) {
-            logSevereException("Error opening log file for writing: "
-                    + logFileName, ex);
+            logSevereException("Error opening log file for writing: " + logFileName, ex);
             isOK = false;
             return;
         }
     }
 
     public void logTransaction(String thisLine) {
-        if (logWriter == null)
+        if (logWriter == null) {
             return;
+        }
         try {
             logWriter.newLine();
             logWriter.write(thisLine);
-            if (this.autoFlush)
+            if (this.autoFlush) {
                 logWriter.flush();
+            }
         } catch (IOException ex) {
-            logSevereException("Error writing output line to log file: "
-                    + logFileName, ex);
+            logSevereException("Error writing output line to log file: " + logFileName, ex);
             isOK = false;
         }
     }
 
     protected void finalize() {
-        if (logWriter == null)
+        if (logWriter == null) {
             return;
+        }
         try {
             logWriter.flush();
         } catch (IOException ex) {
-            logSevereException("Error flushing output while closing logfile:"
-                    + logFileName, ex);
+            logSevereException("Error flushing output while closing logfile:" + logFileName, ex);
         }
         try {
             logWriter.close();

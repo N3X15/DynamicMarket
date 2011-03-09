@@ -2,18 +2,13 @@ package com.gmail.haloinverse.DynamicMarket;
 
 public class ItemClump {
 
-    // Implemented because bukkit's ItemStack methods don't handle item subtypes
-    // consistently.
-
-    // Added in to be a convenient package for grabbing entire items worth of
-    // shop data at once,
+    // Implemented because bukkit's ItemStack methods don't handle item subtypes consistently.
+    // Added in to be a convenient package for grabbing entire items worth of shop data at once,
     // instead of one int at at time or in an easily-confused array.
-    // Also factorizes in some redundant string-parsing code, making it easier
-    // to change standard input formats
+    // Also factorizes in some redundant string-parsing code, making it easier to change standard input formats
     // if necessary (and shrinking the compiled .jar significantly)
     public int itemId; // id of item
-    public int subType; // Subtype of item (i.e. dye colour); 0 if undamaged
-                        // single-typed item.
+    public int subType; 	// Subtype of item (i.e. dye colour); 0 if undamaged single-typed item.
     public int count; // Number of items in this clump.
 
     public ItemClump() {
@@ -81,24 +76,24 @@ public class ItemClump {
                 subType = -1;
             } else {
                 if (namesDB != null) {
-                    ItemClump foundItem = namesDB.nameLookup(initData[0],
-                            shopLabel);
+                    ItemClump foundItem = namesDB.nameLookup(initData[0], shopLabel);
                     if (foundItem != null) {
                         itemId = foundItem.itemId;
-                        if (!subtypeParsed)
+                        if (!subtypeParsed) {
                             subType = foundItem.subType;
+                        }
                     }
                 }
             }
         }
 
-        if (count < 1)
+        if (count < 1) {
             count = 1;
+        }
     }
 
     public String idString() {
-        return String.valueOf(itemId)
-                + (subType == 0 ? "" : "," + String.valueOf(subType));
+        return String.valueOf(itemId) + (subType == 0 ? "" : "," + String.valueOf(subType));
     }
 
     public String getName(DatabaseMarket namesDB, String shopLabel) {
@@ -108,17 +103,19 @@ public class ItemClump {
     }
 
     public boolean isValid() {
-        if ((itemId != -1) && (subType != -1))
+        if ((itemId != -1) && (subType != -1)) {
             return true;
-        if (isDefault())
+        }
+        if (isDefault()) {
             return true;
+        }
         return false;
     }
 
     public boolean isDefault() {
-        if ((itemId == -1) && (subType == -1))
+        if ((itemId == -1) && (subType == -1)) {
             return true;
+        }
         return false;
     }
-
 }
