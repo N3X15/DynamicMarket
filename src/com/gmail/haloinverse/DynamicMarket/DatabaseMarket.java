@@ -350,6 +350,8 @@ public class DatabaseMarket extends DatabaseCore
 			logSevereException("Error retrieving shop item data with " + dbTypeString(), ex);
 		}
 		
+		myQuery.close();
+		
 		return returnVal;
 	}
 		
