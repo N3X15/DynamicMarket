@@ -61,16 +61,16 @@ public class DatabaseMarket extends DatabaseCore
 	protected boolean createTable(String shopLabel)
 	{
 		SQLHandler myQuery = new SQLHandler(this);
-		if (!myQuery.checkTable(tableName))
-			createTable();
-		else
+		if (!myQuery.checkTable(tableName)) {
+			myQuery.close();
+			return createTable();
+		} else
 			return false;
-		return add(new MarketItem("-1,-1 n:Default", new MarketItem(), this, shopLabel));
 	}
 	
 	protected boolean createTable() {
 		SQLHandler myQuery = new SQLHandler(this);
-		if (this.databaseType.equals(Type.SQLITE))
+		if (this.databaseType.equals(Type.SQLITE)) {
 			myQuery.executeStatement("CREATE TABLE " + tableName + " ( id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 					"item INT NOT NULL, " +
 					"subtype INT NOT NULL, " +
@@ -99,7 +99,8 @@ public class DatabaseMarket extends DatabaseCore
 					"CREATE INDEX nameIndex ON Market (name);" +
 					"CREATE INDEX shoplabelIndex ON Market (shoplabel)"
 					);
-		else
+		
+		} else {
 			myQuery.executeStatement("CREATE TABLE " + tableName + " ( id INT( 255 ) NOT NULL AUTO_INCREMENT, " +
 					"item INT NOT NULL, " +
 					"subtype INT NOT NULL, " +
@@ -124,6 +125,7 @@ public class DatabaseMarket extends DatabaseCore
 					"class INT NOT NULL, " +
 					"shoplabel CHAR(20) NOT NULL DEFAULT '', " +
 					"PRIMARY KEY ( id ), INDEX ( item, subtype, name, shoplabel )) ENGINE = "+ engine + ";");
+		}
 		myQuery.close();
 		
 		if (!myQuery.isOK)
@@ -131,7 +133,7 @@ public class DatabaseMarket extends DatabaseCore
 		
 		// Add default record.
 		
-		return add(new MarketItem("-1,-1 n:Default", null, this, ""));
+		return add(new MarketItem("-1,-1 n:Default", new MarketItem(), this, ""));
 	}
 	
 	public boolean add(Object newItem)

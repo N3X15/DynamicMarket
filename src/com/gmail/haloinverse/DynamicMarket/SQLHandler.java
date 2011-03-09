@@ -26,6 +26,7 @@ public class SQLHandler {
 		inputList = new ArrayList<Object>();
 		psList = new ArrayList<PreparedStatement>();
 		connDB = thisDB;
+		
 		try {
 			conn = connDB.connection();
 			conn.setAutoCommit(false);
