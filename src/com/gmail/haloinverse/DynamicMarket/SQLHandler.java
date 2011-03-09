@@ -278,13 +278,13 @@ public class SQLHandler {
 				connDB.logSevereException("SQL error closing prepared statement for " + connDB.dbTypeString() + "database", ex);
 				isOK = false;
 			}
-		if (conn != null)
-			try {
-				conn.close();
-			} catch (SQLException ex) {
-				connDB.logSevereException("SQL error closing connection for " + connDB.dbTypeString() + "database", ex);
-				isOK = false;
-			}
+//		if (conn != null)
+//			try {
+//				conn.close();
+//			} catch (SQLException ex) {
+//				connDB.logSevereException("SQL error closing connection for " + connDB.dbTypeString() + "database", ex);
+//				isOK = false;
+//			}
 	}
 	
 	protected void finalize() throws Throwable {

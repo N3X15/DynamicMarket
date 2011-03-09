@@ -489,7 +489,7 @@ public class iListen extends PlayerListener
 	{
 		//plugin.iC.l.showBalance(player.getName(), player, true);
 		int thisBalance = get_balance(player.getName());
-		message.send("{} Balance: {PRM}" + thisBalance + " " + getCurrencyName(thisBalance) + (Math.abs(thisBalance)==1? "" : "s"));
+		message.send("{} Balance: {PRM}" + thisBalance + " " + getCurrencyName(thisBalance) );
 	}
    
 	private void delta_balance(String name, int amount) //throws InvalidTransactionException

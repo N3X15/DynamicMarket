@@ -13,6 +13,7 @@ public abstract class DatabaseCore
 		public String tableName; // default: SimpleMarket
 		public DynamicMarket plugin = null;
 		public String engine = "MyISAM";
+		public Connection conn = null;
 
 		public DatabaseCore(Type databaseType, String tableAccessed, String thisEngine, DynamicMarket thisPlugin) {
      		this.databaseType = databaseType;
@@ -25,6 +26,17 @@ public abstract class DatabaseCore
  
 		protected boolean initialize()
 		{
+			try {
+				conn = connection();
+				conn.setAutoCommit(false);
+			} catch (ClassNotFoundException ex) {
+				logSevereException("Database connector not found for " + dbTypeString(), ex);
+				conn = null;
+			} catch (SQLException ex) {
+				logSevereException("SQL Error connecting to " + dbTypeString() + "database", ex);
+				conn = null;
+			}
+			
 			return initialize("");
 		}
 		
@@ -75,7 +87,9 @@ public abstract class DatabaseCore
 
  
 			protected Connection connection() throws ClassNotFoundException, SQLException {
-				//CHANGED: Sets connections to auto-commit, rather than emergency commit-on-close behaviour.
+				if ( conn != null ) return conn;
+				
+				//CHANGED: Sets connections to auto-commit, rather than emergency commit-on-close behaviour.				
 				Connection newConn;
 				if (this.databaseType.equals(Type.SQLITE)) {
 /*  52 */       	Class.forName("org.sqlite.JDBC");
