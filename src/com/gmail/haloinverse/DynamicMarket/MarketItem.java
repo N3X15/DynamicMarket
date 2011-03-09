@@ -15,10 +15,10 @@ public class MarketItem extends ItemClump {
 	private int volatility; 	//v		// % change in price per 1 stock bought/sold, * intScale
 								//iv	// inverse volatility; units bought/sold per doubling/halving of price
 	public int salesTax;   		//st	// basePrice * (1 - (salesTax/100)) = selling price
-	public int stockLowest;		//sl	// minimum stock at which purchases will fail (hard limit)
-	public int stockHighest;	//sh	// maximum stock at which sales will fail (hard limit)
-	public int stockFloor;		//sf	// minimum stock level possible (soft limit)
-	public int stockCeil;		//sc	// maximum stock level possible (soft limit)
+	public int stockLowest;		//sl	// minimum stock at which purchases will fail
+	public int stockHighest;	//sh	// maximum stock at which sales will fail
+	public int stockFloor;		//sf	// minimum stock level possible
+	public int stockCeil;		//sc	// maximum stock level possible
 	public int priceFloor;		//pf	// minimum price <- applies to basePrice, without salesTax
 	public int priceCeil;		//pc	// maximum price
 	public int jitterPerc;
@@ -83,17 +83,13 @@ public class MarketItem extends ItemClump {
 		//TODO: Add alternate input format for setting low/high ranges with a single tag.
 		
 		super(initString.split(" ",2)[0], thisDB, thisShopLabel); // Parse id/name, type, and count from first split.
-				
+		
 		thisDatabase = thisDB;
 		shopLabel = thisShopLabel;
 		
 		//SimpleMarket.log.info("[1] InitString: [" + initString + "]");
 		
 		String[] initData = initString.split(" ");
-		
-		// If 0th tag (name) does not contain ":", use count from defaults.
-		if(!initData[0].contains(":"))
-			this.count = defaults.count;
 		 		
 		// Load defaults, if available.
 		if (defaults != null)
@@ -435,24 +431,33 @@ public class MarketItem extends ItemClump {
 	private void sanityCheck()
 	{
 		// Check and fix possible chaos-inducing data.
-		// Mirrors DatabaseMarket.sanityCheckAll.
+		
+		int tempInt;
 		
 		this.salesTax = rangeCrop(this.salesTax, 0, 100);
 		
-		if (this.stockHighest < this.stock)
-			this.stockHighest = this.stock;
+		if (this.stockHighest < this.stockLowest)
+		{
+			tempInt = this.stockHighest;
+			this.stockHighest = this.stockLowest;
+			this.stockLowest = tempInt;
+		}
 		
-		if (this.stockLowest > this.stock)
-			this.stockLowest = this.stock;		
-
-		if (this.stockCeil < this.stock)
-			this.stockCeil = this.stock;
-
-		if (this.stockFloor > this.stock)
-			this.stockFloor = this.stock;
+		if (this.stockCeil < this.stockFloor)
+		{
+			tempInt = this.stockCeil;
+			this.stockCeil = this.stockFloor;
+			this.stockFloor = tempInt;
+		}
 		
 		if (this.priceCeil < this.priceFloor)
+		{
+			tempInt = this.priceCeil;
 			this.priceCeil = this.priceFloor;
+			this.priceFloor = tempInt;
+		}
+		
+		this.stock = rangeCrop(rangeCrop(this.stock, this.stockLowest, this.stockHighest), this.stockFloor, this.stockCeil);
 		
 		this.basePrice = Math.max(0, this.basePrice);
 	}

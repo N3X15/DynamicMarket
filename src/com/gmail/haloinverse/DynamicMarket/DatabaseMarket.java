@@ -28,49 +28,52 @@ public class DatabaseMarket extends DatabaseCore
 		super(database, tableAccessed, thisEngine, pluginRef);
 		this.itemsReference = null;
 	}
-
-	protected void checkColumn(String columnName, String columnDef, String index) {
-		SQLHandler myQuery = new SQLHandler(this);
-		if (!myQuery.checkColumnExists(tableName, columnName))
-		{
-			myQuery.prepareStatement("ALTER TABLE " + tableName + " ADD " + columnName + " " + columnDef);
-			myQuery.prepareStatement(index);
-			myQuery.executeUpdates();			
-		}
-		myQuery.close();
-	}
 	
 	protected void checkColumn(String columnName, String columnDef)
 	{
+		//System.out.println("Column name: " + columnName + "column def: " + columnDef);
 		SQLHandler myQuery = new SQLHandler(this);
 		if (!myQuery.checkColumnExists(tableName, columnName))
 		{
-			myQuery.prepareStatement("ALTER TABLE " + tableName + " ADD " + columnName + " " + columnDef);
-			myQuery.executeUpdates();
+			myQuery.prepareStatement("ALTER TABLE " + tableName + " ADD "+columnName + " " + columnDef);
+			myQuery.executeUpdate();
+			if(this.database.equals(Type.SQLITE)) {
+				myQuery.prepareStatement("CREATE INDEX shoplabelIndex ON Market (shoplabel)");
+				myQuery.executeUpdate();
+			} else {
+				myQuery.prepareStatement("CREATE INDEX shopLabelIndex ON Market (shopLabel)");
+				myQuery.executeUpdate();		
+			}
+			
+
 		}
-		myQuery.close();
 	}
 	
 	protected void checkNewFields()
 	{
-		checkColumn("shoplabel", (this.databaseType.equals(Type.SQLITE)?
-				"TEXT NOT NULL DEFAULT '';"
-				: "CHAR(20) NOT NULL DEFAULT ''"), "CREATE INDEX shoplabelIndex ON Market (shoplabel)" );
+		if(this.database.equals(Type.SQLITE)) {
+			checkColumn("shoplabel","TEXT NOT NULL DEFAULT ''");
+		} else {
+			checkColumn("shoplabel", "CHAR(20) NOT NULL DEFAULT ''");
+		}
+		//checkColumn("shoplabel", (this.database.equals(Type.SQLITE)?
+				//"TEXT NOT NULL DEFAULT ''; CREATE INDEX shoplabelIndex ON Market (shoplabel)"
+				//: "CHAR(20) NOT NULL DEFAULT ''; CREATE INDEX shopLabelIndex ON Market (shopLabel)"));
 	}
 	
 	protected boolean createTable(String shopLabel)
 	{
 		SQLHandler myQuery = new SQLHandler(this);
-		if (!myQuery.checkTable(tableName)) {
-			myQuery.close();
-			return createTable();
-		} else
+		if (!myQuery.checkTable(tableName))
+			createTable();
+		else
 			return false;
+		return add(new MarketItem("-1,-1 n:Default", null, this, shopLabel));
 	}
 	
 	protected boolean createTable() {
 		SQLHandler myQuery = new SQLHandler(this);
-		if (this.databaseType.equals(Type.SQLITE)) {
+		if (this.database.equals(Type.SQLITE))
 			myQuery.executeStatement("CREATE TABLE " + tableName + " ( id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 					"item INT NOT NULL, " +
 					"subtype INT NOT NULL, " +
@@ -97,10 +100,8 @@ public class DatabaseMarket extends DatabaseCore
 					"CREATE INDEX itemIndex ON Market (item);" +
 					"CREATE INDEX subtypeIndex ON Market (subtype);" +
 					"CREATE INDEX nameIndex ON Market (name);" +
-					"CREATE INDEX shoplabelIndex ON Market (shoplabel)"
-					);
-		
-		} else {
+					"CREATE INDEX shoplabelIndex ON Market (shoplabel)");
+		else
 			myQuery.executeStatement("CREATE TABLE " + tableName + " ( id INT( 255 ) NOT NULL AUTO_INCREMENT, " +
 					"item INT NOT NULL, " +
 					"subtype INT NOT NULL, " +
@@ -125,7 +126,6 @@ public class DatabaseMarket extends DatabaseCore
 					"class INT NOT NULL, " +
 					"shoplabel CHAR(20) NOT NULL DEFAULT '', " +
 					"PRIMARY KEY ( id ), INDEX ( item, subtype, name, shoplabel )) ENGINE = "+ engine + ";");
-		}
 		myQuery.close();
 		
 		if (!myQuery.isOK)
@@ -133,7 +133,7 @@ public class DatabaseMarket extends DatabaseCore
 		
 		// Add default record.
 		
-		return add(new MarketItem("-1,-1 n:Default", new MarketItem(), this, ""));
+		return add(new MarketItem("-1,-1 n:Default", null, this, ""));
 	}
 	
 	public boolean add(Object newItem)
@@ -170,7 +170,7 @@ public class DatabaseMarket extends DatabaseCore
 		myQuery.prepareStatement("INSERT INTO " + tableName + " (item, subtype, count, name, baseprice, stock, canbuy, cansell, volatility, " +
 		"salestax, stocklowest, stockhighest, stockfloor, stockceil, pricefloor, priceceil, class, jitterperc, driftin, driftout, avgstock, shoplabel) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,0,0,0,0,?)");
 		
-		myQuery.executeUpdates();
+		myQuery.executeUpdate();
 		
 		myQuery.close();
 		return (myQuery.isOK);
@@ -199,9 +199,9 @@ public class DatabaseMarket extends DatabaseCore
 		myQuery.inputList.add(updated.shopLabel);
 		
 		myQuery.prepareStatement("UPDATE " + tableName + " SET count = ?, name = ?, baseprice = ?, stock = ?, canbuy = ?, cansell = ?, volatility = ?, " +
-				"salestax = ?, stocklowest = ?, stockhighest = ?, stockfloor = ?, stockceil = ?, pricefloor = ?, priceceil = ? WHERE item = ? AND subtype = ? AND shoplabel = ? " + ((this.databaseType.equals(Type.SQLITE)) ? "" : " LIMIT 1"));
+				"salestax = ?, stocklowest = ?, stockhighest = ?, stockfloor = ?, stockceil = ?, pricefloor = ?, priceceil = ? WHERE item = ? AND subtype = ? AND shoplabel = ? " + ((this.database.equals(Type.SQLITE)) ? "" : " LIMIT 1"));
 
-		myQuery.executeUpdates();
+		myQuery.executeUpdate();
 		
 		myQuery.close();
 		return (myQuery.isOK);
@@ -279,7 +279,42 @@ public class DatabaseMarket extends DatabaseCore
 	{
 		return data(thisItem, "");
 	}
-	
+
+	private boolean isInteger( String input )  
+	{  
+	   try  
+	   {  
+	      Integer.parseInt( input );  
+	      return true;  
+	   }  
+	   catch( Exception e)  
+	   {  
+	      return false;  
+	   }  
+	}  
+
+	public boolean inShop (String itemID) {
+		SQLHandler myQuery = new SQLHandler(this);
+		if(isInteger(itemID)) {
+			myQuery.inputList.add(itemID);
+			myQuery.prepareStatement("SELECT * FROM " + tableName + " WHERE item = ?");
+		} else {
+			myQuery.inputList.add("%" + itemID + "%");
+			myQuery.prepareStatement("SELECT * FROM " + tableName + " WHERE name LIKE ?");
+		}
+		//System.out.println("SQL: " + myQuery.ps.toString());
+		myQuery.executeQuery();
+		
+		try{
+			if(myQuery.rs != null) 
+				if (myQuery.rs.next())
+				return true;
+		} catch (SQLException ex) {
+			logSevereException("Error retrieving shop item data with " + dbTypeString(), ex);
+			return false;
+		}
+		return false;
+	}
 	public MarketItem data(ItemClump thisItem, String shopLabel) {
 	  //CHANGED: Returns MarketItems now.
 		SQLHandler myQuery = new SQLHandler(this);
@@ -295,18 +330,11 @@ public class DatabaseMarket extends DatabaseCore
 		try {
 			if (myQuery.rs != null)
 				if (myQuery.rs.next())
-				{
 					//data = new ShopItem(myQuery.rs.getInt("item"), myQuery.rs.getInt("type"), myQuery.rs.getInt("buy"), myQuery.rs.getInt("sell"), myQuery.rs.getInt("per"));
 					fetchedData = new MarketItem(myQuery);
-					if (fetchedData == null)
-					{
-						logSevereException("MarketItem creation from query failed. " + dbTypeString());	
-						myQuery.close();
-						return null;
-					}
+					fetchedData.shopLabel = shopLabel;
 					fetchedData.thisDatabase = this;
 					// TODO: Change constructor to take a ResultSet and throw SQLExceptions.
-				}
 		} catch (SQLException ex) {
 			logSevereException("Error retrieving shop item data with " + dbTypeString(), ex);
 			fetchedData = null;
@@ -350,8 +378,6 @@ public class DatabaseMarket extends DatabaseCore
 			logSevereException("Error retrieving shop item data with " + dbTypeString(), ex);
 		}
 		
-		myQuery.close();
-		
 		return returnVal;
 	}
 		
@@ -363,13 +389,13 @@ public class DatabaseMarket extends DatabaseCore
 		myQuery.inputList.add(thisItem.itemId);
 		myQuery.inputList.add(thisItem.subType);
   		myQuery.inputList.add(shopLabel);
-		if (this.databaseType.equals(Type.SQLITE))
-			myQuery.prepareStatement("UPDATE " + tableName + " SET stock = min(stock + ?, stockceil) WHERE (item = ? AND subtype = ? AND shoplabel = ?) " + ((this.databaseType.equals(Type.SQLITE)) ? "" : " LIMIT 1"));
+		if (this.database.equals(Type.SQLITE))
+			myQuery.prepareStatement("UPDATE " + tableName + " SET stock = min(stock + ?, stockceil) WHERE (item = ? AND subtype = ? AND shoplabel = ?) " + ((this.database.equals(Type.SQLITE)) ? "" : " LIMIT 1"));
 		else
-			myQuery.prepareStatement("UPDATE " + tableName + " SET stock = LEAST(stock + ?, stockceil) WHERE (item = ? AND subtype = ? AND shoplabel = ?) " + ((this.databaseType.equals(Type.SQLITE)) ? "" : " LIMIT 1"));
+			myQuery.prepareStatement("UPDATE " + tableName + " SET stock = LEAST(stock + ?, stockceil) WHERE (item = ? AND subtype = ? AND shoplabel = ?) " + ((this.database.equals(Type.SQLITE)) ? "" : " LIMIT 1"));
 			
 
-		myQuery.executeUpdates();
+		myQuery.executeUpdate();
 		
 		myQuery.close();
 
@@ -384,12 +410,12 @@ public class DatabaseMarket extends DatabaseCore
 		myQuery.inputList.add(thisItem.itemId);
 		myQuery.inputList.add(thisItem.subType);
   		myQuery.inputList.add(shopLabel);
-		//if (this.databaseType.equals(Type.SQLITE))
-		//	myQuery.prepareStatement("UPDATE " + tableName + " SET stock = max(stock - ?, stockfloor) WHERE (item = ? AND subtype = ? AND shoplabel = ?))");
-		//else
-			myQuery.prepareStatement("UPDATE " + tableName + " SET stock = GREATEST(stock - ?, stockfloor) WHERE (item = ? AND subtype = ? AND shoplabel = ?)" + ((this.databaseType.equals(Type.SQLITE)) ? "" : " LIMIT 1" ));
+		if (this.database.equals(Type.SQLITE))
+			myQuery.prepareStatement("UPDATE " + tableName + " SET stock = max(stock - ?, stockfloor) WHERE (item = ? AND subtype = ? AND shoplabel = ?) " + ((this.database.equals(Type.SQLITE)) ? "" : " LIMIT 1"));
+		else
+			myQuery.prepareStatement("UPDATE " + tableName + " SET stock = GREATEST(stock - ?, stockfloor) WHERE (item = ? AND subtype = ? AND shoplabel = ?) " + ((this.database.equals(Type.SQLITE)) ? "" : " LIMIT 1"));
 		
-		myQuery.executeUpdates();
+		myQuery.executeUpdate();
 		
 		myQuery.close();
 
@@ -521,9 +547,9 @@ public class DatabaseMarket extends DatabaseCore
 			myQuery.inputList.add(removed.itemId);
 			myQuery.inputList.add(removed.subType);
 	  		myQuery.inputList.add(shopLabel);
-			myQuery.prepareStatement("DELETE FROM " + tableName + " WHERE (item = ? AND subtype = ? AND shoplabel = ?) " + ((this.databaseType.equals(Type.SQLITE)) ? "" : " LIMIT 1"));
+			myQuery.prepareStatement("DELETE FROM " + tableName + " WHERE (item = ? AND subtype = ? AND shoplabel = ?) " + ((this.database.equals(Type.SQLITE)) ? "" : " LIMIT 1"));
 
-			myQuery.executeUpdates();
+			myQuery.executeUpdate();
 			
 			myQuery.close();
 			return myQuery.isOK;
@@ -636,41 +662,61 @@ public class DatabaseMarket extends DatabaseCore
 		return true;
 	}
 
-	private void updateAll(SQLHandler myQuery, String fieldName, Object newValue, String shopLabel)
+	private boolean updateAll(String fieldName, Object newValue, String shopLabel)
 	{
 		// Update fieldName to newValue in all records matching shopLabel.
+		SQLHandler myQuery = new SQLHandler(this);
+
 		myQuery.inputList.add(newValue);
 		myQuery.inputList.add(shopLabel);
 		myQuery.prepareStatement("UPDATE " + tableName + " SET " + fieldName + " = ? WHERE shoplabel = ?");
+		
+		myQuery.executeUpdate();
+		
+		myQuery.close();
+
+		return myQuery.isOK;
 	}
 	
-	private void updateAllExpr(SQLHandler myQuery, String fieldName, String updExpr, String shopLabel)
+	private boolean updateAllExpr(String fieldName, String updExpr, String shopLabel)
 	{
-		// Update fieldName to expression updExpr in all records matching shopLabel.
+		SQLHandler myQuery = new SQLHandler(this);
+
 		myQuery.inputList.add(shopLabel);
 		myQuery.prepareStatement("UPDATE " + tableName + " SET " + fieldName + " = " + updExpr + " WHERE shoplabel = ?");
+		
+		myQuery.executeUpdate();
+		
+		myQuery.close();
+
+		return myQuery.isOK;
 	}
 	
-	private void updateAllExprWhere(SQLHandler myQuery, String fieldName, String updExpr, String whereClause, String shopLabel)
+	private boolean updateAllExprWhere(String fieldName, String updExpr, String whereClause, String shopLabel)
 	{
-		// Update fieldName to expression updExpr in all records matching whereClause and shopLabel.
+		SQLHandler myQuery = new SQLHandler(this);
+
 		myQuery.inputList.add(shopLabel);
 		myQuery.prepareStatement("UPDATE " + tableName + " SET " + fieldName + " = " + updExpr + " WHERE (shoplabel = ? AND " + whereClause + ")");
+		
+		myQuery.executeUpdate();
+		
+		myQuery.close();
+
+		return myQuery.isOK;
 	}
 	
-	public boolean updateAllFromTags(String initString, String shopLabel)
+	public void updateAllFromTags(String initData[], String shopLabel)
 	{
 		// Update table data from a list of tags.
 		// Applies changes to every element of the table matching shopLabel.
 		// Mirrors MarketItem.parseTags.
 		// Element [0] is used only to extract count, if provided.
-		String initData[] = initString.split(" ");
 		String curTag;
 		Integer curVal;
 		String stringVal;
 		String[] curParams;
 		boolean setUntaggedBase = false;
-		SQLHandler myQuery = new SQLHandler(this);
 		
 		if (initData[0].contains(":"))
 		{
@@ -682,9 +728,9 @@ public class DatabaseMarket extends DatabaseCore
 			//new.stockItems = prev.stockItems;
 			// new.stock * new.count = prev.stock * old.count;
 			// new.stock = prev.stock * prev.count / new.count;
-			updateAllExpr(myQuery, "baseprice", "ROUND(baseprice * " + countCheck.count + " / count, 0)", shopLabel);
-			updateAllExpr(myQuery, "stock", "ROUND((stock * count / " + countCheck.count + ")-0.5,0)", shopLabel);
-			updateAll(myQuery, "count", countCheck.count, shopLabel);
+			updateAllExpr("baseprice", "ROUND(baseprice * " + countCheck.count + " / count, 0)", shopLabel);
+			updateAllExpr("stock", "ROUND((stock * count / " + countCheck.count + ")-0.5,0)", shopLabel);
+			updateAll("count", countCheck.count, shopLabel);
 		}
 		
 		if (initData.length > 1)
@@ -737,17 +783,17 @@ public class DatabaseMarket extends DatabaseCore
 						if (curVal != -1)
 						{
 							//this.basePrice = curVal;
-							updateAll(myQuery, "baseprice", curVal, shopLabel);
+							updateAll("baseprice", curVal, shopLabel);
 							//maskData.basePrice = 1;
 						}
 						else
 						{
 							// Base price set to -1. Disable buying.
 							//this.basePrice = 0;
-							updateAll(myQuery, "baseprice", 0, shopLabel);
+							updateAll("baseprice", 0, shopLabel);
 							//maskData.basePrice = 1;
 							//this.canBuy = false;
-							updateAll(myQuery, "canbuy", 0, shopLabel);
+							updateAll("canbuy", 0, shopLabel);
 						}
 						setUntaggedBase = true;
 						continue;
@@ -776,15 +822,15 @@ public class DatabaseMarket extends DatabaseCore
 								//maskData.salesTax = 1;
 							}
 							*/
-							updateAllExprWhere(myQuery, "salestax", "ROUND((1 - (" + curVal + " / baseprice)) * 100)", "baseprice > 0", shopLabel);
-							updateAllExprWhere(myQuery, "salestax", "0", "baseprice = 0", shopLabel);
-							updateAllExprWhere(myQuery, "baseprice", curVal.toString(), "baseprice = 0", shopLabel);
+							updateAllExprWhere("salestax", "ROUND((1 - (" + curVal + " / baseprice)) * 100)", "baseprice > 0", shopLabel);
+							updateAllExprWhere("salestax", "0", "baseprice = 0", shopLabel);
+							updateAllExprWhere("baseprice", curVal.toString(), "baseprice = 0", shopLabel);
 						}
 						else
 						{
 							// Sale price set to -1. Disable selling.
 							//this.canSell = false;
-							updateAll(myQuery, "cansell", 0, shopLabel);
+							updateAll("cansell", 0, shopLabel);
 						}
 						continue;
 					}
@@ -799,67 +845,67 @@ public class DatabaseMarket extends DatabaseCore
 						if (curTag.equalsIgnoreCase("bp") || curTag.equalsIgnoreCase("baseprice"))
 						{
 							//this.basePrice = curVal;
-							updateAll(myQuery, "baseprice", curVal, shopLabel);
+							updateAll("baseprice", curVal, shopLabel);
 							continue;
 						}
 						if (curTag.equalsIgnoreCase("s") || curTag.equalsIgnoreCase("stock"))
 						{
 							//this.stock = curVal;
-							updateAll(myQuery, "stock", curVal, shopLabel);
+							updateAll("stock", curVal, shopLabel);
 							continue;
 						}			
 						if (curTag.equalsIgnoreCase("v") || curTag.equalsIgnoreCase("volatility") || curTag.equalsIgnoreCase("vol"))
 						{
 							//this.setVolatility(curVal);
-							updateAll(myQuery, "volatility", curVal, shopLabel);
+							updateAll("volatility", curVal, shopLabel);
 							continue;
 						}
 						if (curTag.equalsIgnoreCase("iv") || curTag.equalsIgnoreCase("invvolatility") || curTag.equalsIgnoreCase("ivol"))
 						{
 							//this.setInverseVolatility(curVal);
-							updateAll(myQuery, "volatility", MarketItem.iVolToVol(curVal), shopLabel);
+							updateAll("volatility", MarketItem.iVolToVol(curVal), shopLabel);
 							continue;
 						}				
 						if (curTag.equalsIgnoreCase("st") || curTag.equalsIgnoreCase("salestax"))
 						{
 							//this.salesTax = rangeCrop(curVal, 0, 100);
-							updateAll(myQuery, "salestax", MarketItem.rangeCrop(curVal, 0, 100), shopLabel);
+							updateAll("salestax", MarketItem.rangeCrop(curVal, 0, 100), shopLabel);
 							continue;
 						}
 						if (curTag.equalsIgnoreCase("sl") || curTag.equalsIgnoreCase("stocklowest"))
 						{
 							//this.stockLowest = curVal;
-							updateAll(myQuery, "stocklowest", curVal, shopLabel);
+							updateAll("stocklowest", curVal, shopLabel);
 							continue;
 						}
 						if (curTag.equalsIgnoreCase("sh") || curTag.equalsIgnoreCase("stockhighest"))
 						{
 							//this.stockHighest = curVal;
-							updateAll(myQuery, "stockhighest", curVal, shopLabel);
+							updateAll("stockhighest", curVal, shopLabel);
 							continue;
 						}
 						if (curTag.equalsIgnoreCase("sf") || curTag.equalsIgnoreCase("stockfloor"))
 						{
 							//this.stockFloor = curVal;
-							updateAll(myQuery, "stockfloor", curVal, shopLabel);
+							updateAll("stockfloor", curVal, shopLabel);
 							continue;
 						}
 						if (curTag.equalsIgnoreCase("sc") || curTag.equalsIgnoreCase("stockceiling"))
 						{
 							//this.stockCeil = curVal;
-							updateAll(myQuery, "stockceil", curVal, shopLabel);
+							updateAll("stockceil", curVal, shopLabel);
 							continue;
 						}
 						if (curTag.equalsIgnoreCase("pf") || curTag.equalsIgnoreCase("pricefloor"))
 						{
 							//this.priceFloor = curVal;
-							updateAll(myQuery, "pricefloor", curVal, shopLabel);
+							updateAll("pricefloor", curVal, shopLabel);
 							continue;
 						}
 						if (curTag.equalsIgnoreCase("pc") || curTag.equalsIgnoreCase("priceceiling"))
 						{
 							//this.priceCeil = curVal;
-							updateAll(myQuery, "priceceil", curVal, shopLabel);
+							updateAll("priceceil", curVal, shopLabel);
 							continue;
 						}
 					}
@@ -867,94 +913,94 @@ public class DatabaseMarket extends DatabaseCore
 				if (curTag.equalsIgnoreCase("flat"))
 				{
 					//this.stock = 0;
-					updateAll(myQuery, "stock", 0, shopLabel);
+					updateAll("stock", 0, shopLabel);
 					//this.stockLowest = Integer.MIN_VALUE;
-					updateAll(myQuery, "stocklowest", Integer.MIN_VALUE, shopLabel);
+					updateAll("stocklowest", Integer.MIN_VALUE, shopLabel);
 					//this.stockHighest = Integer.MAX_VALUE;
-					updateAll(myQuery, "stockhighest", Integer.MAX_VALUE, shopLabel);
+					updateAll("stockhighest", Integer.MAX_VALUE, shopLabel);
 					//this.stockFloor = Integer.MIN_VALUE;
-					updateAll(myQuery, "stockfloor", Integer.MIN_VALUE, shopLabel);
+					updateAll("stockfloor", Integer.MIN_VALUE, shopLabel);
 					//this.stockCeil = Integer.MAX_VALUE;
-					updateAll(myQuery, "stockceil", Integer.MAX_VALUE, shopLabel);
+					updateAll("stockceil", Integer.MAX_VALUE, shopLabel);
 					//this.priceFloor = 0;
-					updateAll(myQuery, "pricefloor", 0, shopLabel);
+					updateAll("pricefloor", 0, shopLabel);
 					//this.priceCeil = Integer.MAX_VALUE;
-					updateAll(myQuery, "priceceil", Integer.MAX_VALUE, shopLabel);
+					updateAll("priceceil", Integer.MAX_VALUE, shopLabel);
 					//this.volatility = 0;
-					updateAll(myQuery, "volatility", 0, shopLabel);
+					updateAll("volatility", 0, shopLabel);
 					continue;
 				}
 				if (curTag.equalsIgnoreCase("fixed"))
 				{
 					//this.stock = 0;
-					updateAll(myQuery, "stock", 0, shopLabel);
+					updateAll("stock", 0, shopLabel);
 					//this.stockLowest = Integer.MIN_VALUE;
-					updateAll(myQuery, "stocklowest", Integer.MIN_VALUE, shopLabel);
+					updateAll("stocklowest", Integer.MIN_VALUE, shopLabel);
 					//this.stockHighest = Integer.MAX_VALUE;
-					updateAll(myQuery, "stockhighest", Integer.MAX_VALUE, shopLabel);
+					updateAll("stockhighest", Integer.MAX_VALUE, shopLabel);
 					//this.stockFloor = 0;
-					updateAll(myQuery, "stockfloor", 0, shopLabel);
+					updateAll("stockfloor", 0, shopLabel);
 					//this.stockCeil = 0;
-					updateAll(myQuery, "stockceil", 0, shopLabel);
+					updateAll("stockceil", 0, shopLabel);
 					//this.priceFloor = 0;
-					updateAll(myQuery, "pricefloor", 0, shopLabel);
+					updateAll("pricefloor", 0, shopLabel);
 					//this.priceCeil = Integer.MAX_VALUE;
-					updateAll(myQuery, "priceceil", Integer.MAX_VALUE, shopLabel);
+					updateAll("priceceil", Integer.MAX_VALUE, shopLabel);
 					//this.volatility = 0;
-					updateAll(myQuery, "volatility", 0, shopLabel);
+					updateAll("volatility", 0, shopLabel);
 					continue;
 				}
 				if (curTag.equalsIgnoreCase("float"))
 				{
 					//this.stockFloor = Integer.MIN_VALUE;
-					updateAll(myQuery, "stockfloor", Integer.MIN_VALUE, shopLabel);
+					updateAll("stockfloor", Integer.MIN_VALUE, shopLabel);
 					//this.stockCeil = Integer.MAX_VALUE;
-					updateAll(myQuery, "stockceil", Integer.MAX_VALUE, shopLabel);
+					updateAll("stockceil", Integer.MAX_VALUE, shopLabel);
 					//this.stockLowest = Integer.MIN_VALUE;
-					updateAll(myQuery, "stocklowest", Integer.MIN_VALUE, shopLabel);
+					updateAll("stocklowest", Integer.MIN_VALUE, shopLabel);
 					//this.stockHighest = Integer.MAX_VALUE;
-					updateAll(myQuery, "stockhighest", Integer.MAX_VALUE, shopLabel);
+					updateAll("stockhighest", Integer.MAX_VALUE, shopLabel);
 					//this.priceFloor = 0;
-					updateAll(myQuery, "pricefloor", 0, shopLabel);
+					updateAll("pricefloor", 0, shopLabel);
 					//this.priceCeil = Integer.MAX_VALUE;
-					updateAll(myQuery, "priceceil", Integer.MAX_VALUE, shopLabel);
+					updateAll("priceceil", Integer.MAX_VALUE, shopLabel);
 					//if (this.volatility == 0)
 					//	this.volatility = 100;
-					updateAllExprWhere(myQuery, "volatility", "100", "volatility = 0", shopLabel);
+					updateAllExprWhere("volatility", "100", "volatility = 0", shopLabel);
 				}
 				if (curTag.equalsIgnoreCase("finite"))
 				{
 					//this.stockFloor = Integer.MIN_VALUE;
-					updateAll(myQuery, "stockfloor", Integer.MIN_VALUE, shopLabel);
+					updateAll("stockfloor", Integer.MIN_VALUE, shopLabel);
 					//this.stockCeil = Integer.MAX_VALUE;
-					updateAll(myQuery, "stockceil", Integer.MAX_VALUE, shopLabel);
+					updateAll("stockceil", Integer.MAX_VALUE, shopLabel);
 					//this.stockLowest = 0;
-					updateAll(myQuery, "stocklowest", 0, shopLabel);
+					updateAll("stocklowest", 0, shopLabel);
 					//this.stockHighest = Integer.MAX_VALUE;
-					updateAll(myQuery, "stockhighest", Integer.MAX_VALUE, shopLabel);
+					updateAll("stockhighest", Integer.MAX_VALUE, shopLabel);
 				}
 				if ((curTag.equalsIgnoreCase("buyok")) || (curTag.equalsIgnoreCase("!nobuy")))
 				{
 					//this.canBuy = true;
-					updateAll(myQuery, "canbuy", 1, shopLabel);
+					updateAll("canbuy", 1, shopLabel);
 					continue;
 				}
 				if ((curTag.equalsIgnoreCase("sellok")) || (curTag.equalsIgnoreCase("!nosell")))
 				{
 					//this.canSell = true;
-					updateAll(myQuery, "cansell", 1, shopLabel);
+					updateAll("cansell", 1, shopLabel);
 					continue;
 				}
 				if ((curTag.equalsIgnoreCase("!buyok")) || (curTag.equalsIgnoreCase("nobuy")) || (curTag.equalsIgnoreCase("!cb")))
 				{
 					//this.canBuy = false;
-					updateAll(myQuery, "canbuy", 0, shopLabel);
+					updateAll("canbuy", 0, shopLabel);
 					continue;
 				}
 				if ((curTag.equalsIgnoreCase("!sellok")) || (curTag.equalsIgnoreCase("nosell")) || (curTag.equalsIgnoreCase("!cs")))
 				{
 					//this.canSell = false;
-					updateAll(myQuery, "cansell", 0, shopLabel);
+					updateAll("cansell", 0, shopLabel);
 					continue;
 				}
 				if (curTag.equalsIgnoreCase("cb") || curTag.equalsIgnoreCase("canbuy"))
@@ -963,13 +1009,13 @@ public class DatabaseMarket extends DatabaseCore
 					{
 						//this.canBuy = ((stringVal.toLowerCase().startsWith("y")) || (stringVal.toLowerCase().startsWith("t")));
 						if ((stringVal.toLowerCase().startsWith("y")) || (stringVal.toLowerCase().startsWith("t")))
-							updateAll(myQuery, "canbuy", 1, shopLabel);
+							updateAll("canbuy", 1, shopLabel);
 						else
-							updateAll(myQuery, "canbuy", 0, shopLabel);
+							updateAll("canbuy", 0, shopLabel);
 					}
 					else
 						//this.canBuy = true;
-						updateAll(myQuery, "canbuy", 1, shopLabel);
+						updateAll("canbuy", 1, shopLabel);
 					continue;
 				}
 				if (curTag.equalsIgnoreCase("cs") || curTag.equalsIgnoreCase("cansell"))
@@ -978,13 +1024,13 @@ public class DatabaseMarket extends DatabaseCore
 					{
 						//this.canSell = ((stringVal.toLowerCase().startsWith("y")) || (stringVal.toLowerCase().startsWith("t")));
 						if ((stringVal.toLowerCase().startsWith("y")) || (stringVal.toLowerCase().startsWith("t")))
-							updateAll(myQuery, "cansell", 1, shopLabel);
+							updateAll("cansell", 1, shopLabel);
 						else
-							updateAll(myQuery, "cansell", 0, shopLabel);
+							updateAll("cansell", 0, shopLabel);
 					}
 					else
 						//this.canSell = true;
-						updateAll(myQuery, "cansell", 1, shopLabel);
+						updateAll("cansell", 1, shopLabel);
 					continue;
 				}
 				/*
@@ -1012,90 +1058,22 @@ public class DatabaseMarket extends DatabaseCore
 					//this.basePrice = ROUND(oldBuyPrice / POW((1 + volatility/INTSCALE), -LEAST(GREATEST(stock, stockFloor), stockCeil)));
 					//this.basePrice = ROUND(LEAST(GREATEST(baseprice * POW((1 + volatility/INTSCALE), -LEAST(GREATEST(stock, stockfloor), stockceil)), pricefloor), priceceil) / POW((1 + volatility/INTSCALE), -LEAST(GREATEST(stock, stockFloor), stockCeil)));
 					//blerg! all this to do the update within a single MySQL statement!
-					//And it's not even translatable to SQLite!
 					//Maybe use this later. Simple & crude method for right now.
 					
 					// This is ugly and nasty, but necessary for SQLite compatibility.
 					// SQLite doesn't understand ^, POW(), ln(), or EXP() without a tricky-to-install add-on.
 					ArrayList<MarketItem> itemsToEdit = list(0, null, shopLabel);
-					if (!itemsToEdit.isEmpty())
+					for (MarketItem thisItem : itemsToEdit)
 					{
-						myQuery.prepareBatchStatement("UPDATE " + tableName + " SET basePrice = ? WHERE (shoplabel = ? AND item = ? AND subtype = ?");
-						for (MarketItem thisItem : itemsToEdit)
-						{
-							myQuery.inputList.add(Integer.toString(thisItem.getRenormedPrice(newStock)));
-							myQuery.inputList.add(shopLabel);
-							myQuery.inputList.add(thisItem.itemId);
-							myQuery.inputList.add(thisItem.subType);
-							myQuery.addToBatch();
-						}
-						updateAll(myQuery, "stock", newStock, shopLabel);
+						updateAllExprWhere("baseprice", Integer.toString(thisItem.getRenormedPrice(newStock)), "item = "+thisItem.itemId + " AND subtype = "+thisItem.subType, shopLabel);
 					}
+					updateAll("stock", newStock, shopLabel);
 				}
 			}
 			//TODO: Log and report invalid tags somehow.
 		}
-		// Finished parsing tags. Do the update.
-		
-		myQuery.executeUpdates();
-		
-		myQuery.close();
-
-		sanityCheckAll(shopLabel);
-		
-		return myQuery.isOK;
-		
 	}
 
-	private boolean sanityCheckAll(String shopLabel)
-	{
-		// Check and fix possible chaos-inducing data.
-		// Mirrors marketItem.sanityCheck.
-		
-		SQLHandler myQuery = new SQLHandler(this);
-		
-		// Check range of salesTax
-		//this.salesTax = rangeCrop(this.salesTax, 0, 100);
-		myQuery.inputList.add(shopLabel);
-		myQuery.prepareStatement("UPDATE "+tableName+" SET salestax = LEAST(100, GREATEST(salestax, 0)) WHERE shoplabel = ?");
-		
-		//if (this.stockHighest < this.stock)
-		//	this.stockHighest = this.stock;
-		myQuery.inputList.add(shopLabel);
-		myQuery.prepareStatement("UPDATE "+tableName+" SET stockhighest = stock WHERE (shoplabel = ? AND stockhighest < stock)");
-		
-		//if (this.stockLowest > this.stock)
-		//	this.stockLowest = this.stock;		
-		myQuery.inputList.add(shopLabel);
-		myQuery.prepareStatement("UPDATE "+tableName+" SET stocklowest = stock WHERE (shoplabel = ? AND stocklowest > stock)");
-		
-
-		//if (this.stockCeil < this.stock)
-		//	this.stockCeil = this.stock;
-		myQuery.inputList.add(shopLabel);
-		myQuery.prepareStatement("UPDATE "+tableName+" SET stockceil = stock WHERE (shoplabel = ? AND stockceil < stock)");
-
-		//if (this.stockFloor > this.stock)
-		//	this.stockFloor = this.stock;
-		myQuery.inputList.add(shopLabel);
-		myQuery.prepareStatement("UPDATE "+tableName+" SET stockfloor = stock WHERE (shoplabel = ? AND stockfloor > stock)");
-		
-		//if (this.priceCeil < this.priceFloor)
-		//	this.priceCeil = this.priceFloor;
-		myQuery.inputList.add(shopLabel);
-		myQuery.prepareStatement("UPDATE "+tableName+" SET priceceil = pricefloor WHERE (shoplabel = ? AND priceceil < pricefloor)");
-			
-		// Check range of basePrice
-		//this.basePrice = Math.max(0, this.basePrice);
-		myQuery.inputList.add(shopLabel);
-		myQuery.prepareStatement("UPDATE "+tableName+" SET baseprice = 0 WHERE (shoplabel = ? AND baseprice < 0)");
-		
-		myQuery.executeUpdates();
-		
-		myQuery.close();
-		
-		return myQuery.isOK;
-	}
 	
 	/*
 	private boolean updateAll(String[] fieldName, Object[] newValue, String shopLabel)

@@ -7,7 +7,6 @@ import java.io.IOException;
 public class TransactionLogger {
 
 	private BufferedWriter logWriter = null;
-	private DynamicMarket plugin;
 	private String logFileName;
 	public boolean autoFlush;
 	public boolean isOK;
@@ -15,7 +14,6 @@ public class TransactionLogger {
 	public TransactionLogger (DynamicMarket thisPlugin, String fileName, boolean setAutoFlush)
 	{
 		this.isOK = true;
-		this.plugin = thisPlugin;
 		this.logFileName = fileName;
 		this.autoFlush = setAutoFlush;
 		if ((fileName == null) || (fileName.isEmpty()))
@@ -67,6 +65,6 @@ public class TransactionLogger {
 	
 	private void logSevereException(String exDesc, Exception exDetail)
 	{
-		plugin.log.severe("[" + plugin.name + "]: " + exDesc + ": " + exDetail);
+		DynamicMarket.log.severe("[" + DynamicMarket.name + "]: " + exDesc + ": " + exDetail);
 	}
 }

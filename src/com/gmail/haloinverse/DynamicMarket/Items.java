@@ -22,14 +22,12 @@ package com.gmail.haloinverse.DynamicMarket;
 
 			private HashMap<String,String> itemsData;
 			private iProperty ItemsFile;
-			private DynamicMarket plugin;
 	
 			public Items(String itemFileName, DynamicMarket thisPlugin)
 			{
 				//TODO: Handle cases where the plugin loads, but items.db doesn't.
 				//TODO: Add user command for reloading items.db.
 				//TODO: Make item file format more generic.
-				this.plugin = thisPlugin;
 				ItemsFile = new iProperty(itemFileName);
 				// Following code originally in setupItems from SimpleShop
 /* 169 */     	Map<String, String> mappedItems = null;
@@ -38,7 +36,7 @@ package com.gmail.haloinverse.DynamicMarket;
 /*     */     	{
 /* 173 */       	mappedItems = ItemsFile.returnMap();
 /*     */     	} catch (Exception ex) {
-/* 175 */       	plugin.log.info(Messaging.bracketize(new StringBuilder().append(plugin.name).append(" Flatfile").toString()) + " could not grab item list!");
+/* 175 */       	DynamicMarket.log.info(Messaging.bracketize(new StringBuilder().append(DynamicMarket.name).append(" Flatfile").toString()) + " could not grab item list!");
 /*     */     	}
 /*     */     	Iterator<String> i$;
 /* 178 */     	if (mappedItems != null)

@@ -127,6 +127,7 @@ public class ItemClump {
 				return true;
 			return false;
 		}
+	
 		
 		public boolean isDefault()
 		{

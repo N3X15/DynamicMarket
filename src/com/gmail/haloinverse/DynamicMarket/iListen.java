@@ -44,12 +44,12 @@ public class iListen extends PlayerListener
 		{
 			if (plugin.permissionWrapper != null)
 				return plugin.permissionWrapper.permission(sender, permString);
-			plugin.log.severe(Messaging.bracketize(plugin.name) + "WARNING: wrapper-permissions set, but no permission handler registered!");
+			DynamicMarket.log.severe(Messaging.bracketize(DynamicMarket.name) + "WARNING: wrapper-permissions set, but no permission handler registered!");
 			return false;
 		}
 		// Permissions not overridden.
 		if (sender instanceof Player)
-			return Permissions.Security.permission((Player)sender, plugin.name.toLowerCase()+"."+permString);
+			return Permissions.Security.permission((Player)sender, DynamicMarket.name.toLowerCase()+"."+permString);
 		return true;
 	}
 
@@ -63,7 +63,7 @@ public class iListen extends PlayerListener
 			String commands = "";
 			String topics = "";
 			String shortcuts = "";
-			message.send("{}" + Misc.headerify("{CMD} " + plugin.name + " {BKT}({CMD}" + plugin.codename + "{BKT}){} "));
+			message.send("{}" + Misc.headerify("{CMD} " + DynamicMarket.name + " {BKT}({CMD}" + plugin.codename + "{BKT}){} "));
 			message.send("{} {BKT}(){} Optional, {PRM}<>{} Parameter");
 			message.send("{CMD} /shop help {BKT}({PRM}<topic/command>{BKT}){} - Show help.");
 			message.send("{CMD} /shop {PRM}<id>{BKT}({CMD}:{PRM}<count>{BKT}){} - Show buy/sell info on an item.");
@@ -115,7 +115,7 @@ public class iListen extends PlayerListener
 			message.send("{} Other help topics: {PRM}" + topics);
 			return true;
 		}
-		message.send("{}" + Misc.headerify("{} " + plugin.name + " {BKT}({}" + plugin.codename + "{BKT}){} : " + topic + "{} "));
+		message.send("{}" + Misc.headerify("{} " + DynamicMarket.name + " {BKT}({}" + plugin.codename + "{BKT}){} : " + topic + "{} "));
 		if (topic.equalsIgnoreCase("buy"))
 		{
 			if (hasPermission(sender,"buy"))
@@ -423,7 +423,7 @@ public class iListen extends PlayerListener
 		}
 		if (topic.equalsIgnoreCase("about"))
 		{
-			message.send("{} " + plugin.name + " " + plugin.version + " written by HaloInverse.");
+			message.send("{} " + DynamicMarket.name + " " + plugin.version + " written by HaloInverse.");
 			message.send("{} Original structure and portions of code are from SimpleShop 1.1 by Nijikokun.");
 			return true;
 		}				
@@ -435,45 +435,17 @@ public class iListen extends PlayerListener
 		 
 	private int get_balance(String name)
 	{
-		if (!plugin.econLoaded)
+		if (!DynamicMarket.econLoaded)
 			return 0;
 		if ((name != null) && (!name.isEmpty()))
 		{
 			//if (plugin.econType == EconType.ICONOMY2)
 			//	return iConomy.db.get_balance(name);
-			if (plugin.econType == EconType.ICONOMY3)
+			//System.out.println("Econtype: " + plugin.econType.toString());
+			if (plugin.econType == EconType.ICONOMY4) {
+				//System.out.println("User: " + name + "Balance:" + iConomy.getBank().getAccount(name).getBalance());
 				return (int)iConomy.getBank().getAccount(name).getBalance();
-			
-			/*
-			if (plugin.econType == EconType.ANYCONOMY)
-				try {
-					return (int)plugin.anyConomy.getBalance(name);
-				} catch (InternalEconException e) {
-					plugin.log.severe(Messaging.bracketize(plugin.name) + " Internal Economy Error Getting Balance for '" + name + "': " + e);
-					return 0;
-				} catch (NoAccountException e) {
-					try {
-						plugin.anyConomy.createAccount(name);
-					} catch (NoEconRegisteredException e1) {
-						plugin.log.severe(Messaging.bracketize(plugin.name) + " Transaction before economy registered: " + e1);
-						return 0;
-					} catch (InternalEconException e1) {
-						plugin.log.severe(Messaging.bracketize(plugin.name) + " Internal Economy Error Creating Account '" + name + "': " + e1);
-						return 0;
-					} catch (AccountExistsException e1) {
-						plugin.log.severe(Messaging.bracketize(plugin.name) + " Inconsistent NoAccount/AccountExists Errors for '" + name + "': " + e1);
-						return 0;
-					}
-				} catch (NoEconRegisteredException e) {
-					plugin.log.severe(Messaging.bracketize(plugin.name) + " Transaction before economy registered: " + e);
-					return 0;
-				}
-			*/
-			
-			//plugin.log.info(Messaging.bracketize(name) + "GetBalance: " + name + ":" + (int)iConomy.Bank.getAccount(name).getBalance());
-			//return (int)iConomy.Bank.getAccount(name).getBalance();
-			//plugin.log.info(Messaging.bracketize(name) + "GetBalance: " + name + ":" + iConomy.database.getBalance(name));
-			//return (int)iConomy.database.getBalance(name);
+			}
 		}
 		//plugin.log.info(Messaging.bracketize(name) + "GetBalance: (none):0");
 		return 0;
@@ -489,12 +461,12 @@ public class iListen extends PlayerListener
 	{
 		//plugin.iC.l.showBalance(player.getName(), player, true);
 		int thisBalance = get_balance(player.getName());
-		message.send("{} Balance: {PRM}" + thisBalance + " " + getCurrencyName(thisBalance) );
+		message.send("{} Balance: {PRM}" + thisBalance + " " + getCurrencyName(thisBalance));
 	}
    
 	private void delta_balance(String name, int amount) //throws InvalidTransactionException
 	{
-		if (!plugin.econLoaded)
+		if (!DynamicMarket.econLoaded)
 			return;
 		if ((name != null) && (!name.isEmpty()))
 		{
@@ -503,7 +475,7 @@ public class iListen extends PlayerListener
 			//iConomy.Bank.updateAccount(name, iConomy.Bank.getAccount(name).getBalance() + amount);
 			//if (plugin.econType == EconType.ICONOMY2)
 			//	iConomy.db.set_balance(name, get_balance(name) + amount);
-			if (plugin.econType == EconType.ICONOMY3)
+			if (plugin.econType == EconType.ICONOMY4)
 			{
 				Account thisAccount = iConomy.getBank().getAccount(name); 
 				thisAccount.add(amount);
@@ -516,23 +488,23 @@ public class iListen extends PlayerListener
 				try {
 					plugin.anyConomy.addBalance(name, amount);
 				} catch (InternalEconException e) {
-					plugin.log.severe(Messaging.bracketize(plugin.name) + " Internal Economy Error Performing Transaction for '" + name + "': " + e);
+					plugin.log.severe(Messaging.bracketize(DynamicMarket.name) + " Internal Economy Error Performing Transaction for '" + name + "': " + e);
 					return;
 				} catch (NoAccountException e) {
 					try {
 						plugin.anyConomy.createAccount(name);
 					} catch (NoEconRegisteredException e1) {
-						plugin.log.severe(Messaging.bracketize(plugin.name) + " Transaction before economy registered: " + e1);
+						plugin.log.severe(Messaging.bracketize(DynamicMarket.name) + " Transaction before economy registered: " + e1);
 						return;
 					} catch (InternalEconException e1) {
-						plugin.log.severe(Messaging.bracketize(plugin.name) + " Internal Economy Error Creating Account '" + name + "': " + e1);
+						plugin.log.severe(Messaging.bracketize(DynamicMarket.name) + " Internal Economy Error Creating Account '" + name + "': " + e1);
 						return;
 					} catch (AccountExistsException e1) {
-						plugin.log.severe(Messaging.bracketize(plugin.name) + " Inconsistent NoAccount/AccountExists Errors for '" + name + "': " + e1);
+						plugin.log.severe(Messaging.bracketize(DynamicMarket.name) + " Inconsistent NoAccount/AccountExists Errors for '" + name + "': " + e1);
 						return;
 					}
 				} catch (NoEconRegisteredException e) {
-					plugin.log.severe(Messaging.bracketize(plugin.name) + " Transaction before economy registered: " + e);
+					plugin.log.severe(Messaging.bracketize(DynamicMarket.name) + " Transaction before economy registered: " + e);
 					return;
 				}
 			}
@@ -575,9 +547,16 @@ public class iListen extends PlayerListener
 
 	private boolean shopBuyItem(Player player, String itemString, String shopLabel, String accountName)
 	{
-		//TODO: Check for sufficient inventory space for received items.
-		ItemClump requested = new ItemClump(itemString, plugin.db, shopLabel);
 		Messaging message = new Messaging(player);
+		//TODO: Check for sufficient inventory space for received items.
+		String string[] = itemString.split("\\:");
+		if(!plugin.db.inShop(string[0])) {
+			message.send(plugin.shop_tag + "{ERR}Unrecognized item name, or not in shop.");
+		 return false;
+		}
+
+		ItemClump requested = new ItemClump(itemString, plugin.db, shopLabel);
+		
 
 		int balance = get_balance(player.getName());
 		
@@ -622,7 +601,7 @@ public class iListen extends PlayerListener
 		//if (balance < data.buy * requested.count) {
 		if (balance < transValue)
 		{
-			message.send(plugin.shop_tag + "{ERR}You do not have enough " + getCurrencyNamePlural() + " to do this.");
+			message.send(plugin.shop_tag + "{ERR}You do not have enough " + getCurrencyNamePlural() + " to do this. Money: " + balance);
 			message.send(data.infoStringBuy(requested.count));
 			return false;
 		}
@@ -645,7 +624,7 @@ public class iListen extends PlayerListener
 		//		// Roll back previous transaction.
 		//		delta_balance(player.getName(), transValue);
 		//	} catch (InvalidTransactionException e1) {
-		//		plugin.log.severe(Messaging.bracketize(plugin.name) + " Could not roll back '" + player.getName() + "' after invalid transaction with '" + accountName + "': " + e1);
+		//		plugin.log.severe(Messaging.bracketize(DynamicMarket.name) + " Could not roll back '" + player.getName() + "' after invalid transaction with '" + accountName + "': " + e1);
 		//		return false;
 		//	}
 		//}
@@ -665,9 +644,14 @@ public class iListen extends PlayerListener
 	
 	private boolean shopSellItem(Player player, String itemString, String shopLabel, String accountName, boolean freeAccount)
 	{
-		ItemClump requested = new ItemClump(itemString, plugin.db, shopLabel);
 		Messaging message = new Messaging(player);
-
+		String string[] = itemString.split("\\:");
+		if(!plugin.db.inShop(string[0])) {
+			message.send(plugin.shop_tag + "{ERR}Unrecognized item name, or not in shop.");
+		 return false;
+		}
+		ItemClump requested = new ItemClump(itemString, plugin.db, shopLabel);
+		//DEBUG-->System.out.println("ItemClump: " + requested.idString());
 		//int balance = get_balance(player.getName());
 		int transValue;
 
@@ -676,10 +660,10 @@ public class iListen extends PlayerListener
 			message.send("Use: {CMD}/shop sell {PRM}<item id or name>{BKT}({CMD}:{PRM}<bundles>{BKT})");
 			return false;
 		}
-		
+
 		MarketItem data = plugin.db.data(requested, shopLabel);
 		
-		if ((data == null) || !data.isValid()) {
+		if ((data == null) || !data.isValid() && plugin.db.inShop(requested.idString())) {
 			message.send(plugin.shop_tag + "{ERR}Unrecognized item name, or not in shop.");
 			return false;
 		}
@@ -741,7 +725,7 @@ public class iListen extends PlayerListener
 				// Roll back previous transaction.
 		//		delta_balance(player.getName(), -transValue);
 		//	} catch (InvalidTransactionException e1) {
-		//		plugin.log.severe(Messaging.bracketize(plugin.name) + " Could not roll back '" + player.getName() + "' after invalid transaction with '" + accountName + "': " + e1);
+		//		plugin.log.severe(Messaging.bracketize(DynamicMarket.name) + " Could not roll back '" + player.getName() + "' after invalid transaction with '" + accountName + "': " + e1);
 		//		return false;
 		//	}
 		//}
@@ -798,57 +782,20 @@ public class iListen extends PlayerListener
 	
 	private boolean shopUpdateItem(String itemStringIn, Messaging message, String shopLabel)
 	{
-		// Make a copy of itemStringIn, in case modification is needed.
-		String itemString = new String(itemStringIn);
-		
-		// Check if the item name is "all".
-		String firstItem = itemString.split(" ",2)[0];
-		String thisName = firstItem.split(":",2)[0];
-		if (thisName.equalsIgnoreCase("all"))
-		{
-			// Update-all requested.
-			// Check bundle size first.
-			try
-			{
-				if (firstItem.contains(":"))
-					if (Integer.valueOf(firstItem.split(":",2)[1]) > plugin.max_per_sale)
-					{
-						message.send(plugin.shop_tag + "{ERR}Invalid bundle size [" +firstItem.split(":",2)[1]+ "]. (Range: 1.." + plugin.max_per_sale + ")");
-						return false;
-					}
-			}
-			catch (NumberFormatException ex)
-			{
-				message.send(plugin.shop_tag + "{ERR}Invalid bundle size [" +firstItem.split(":",2)[1]+ "]. (Range: 1.." + plugin.max_per_sale + ")");
-				return false;
-			}
-			
-			if (plugin.db.updateAllFromTags(itemStringIn, shopLabel))
-			{
-				message.send(plugin.shop_tag + " All shop items updated.");
-				return true;
-			}
-			else
-			{
-				message.send(plugin.shop_tag + " {ERR}All shop items update failed.");
-				return false;
-			}
-		}
-		// End of update-all subsection
-		
+		String itemString = new String(itemStringIn); 
 		// Fetch the previous record and use it as the default for parsing these string tags.
 
 		ItemClump requested = new ItemClump(itemString, plugin.db, shopLabel);
 
-		if (requested == null) {
+		/*if (requested == null) {
 			message.send(plugin.shop_tag + "{ERR}Unrecognized item name or ID.");
 			return false;
-		}
+		}*/
 		
 		MarketItem prevData = plugin.db.data(requested, shopLabel);
 
 		if (prevData == null) {
-			message.send(plugin.shop_tag + "{ERR}" + itemString.split(" ",2)[0] + " not found in market.");
+			message.send(plugin.shop_tag + "{ERR}" + itemString.split(" ")[0] + " not found in market.");
 			message.send(plugin.shop_tag + "{ERR}Use {CMD}/shop add{ERR} instead.");
 			return false;
 		}
@@ -862,18 +809,18 @@ public class iListen extends PlayerListener
 				itemString = itemSubStrings[0] + " " + itemSubStrings[1];
 					else
 						itemString = itemSubStrings[0];
-		}
+				}
 				
-		MarketItem updated = new MarketItem(itemString, prevData, plugin.db, shopLabel);
+				MarketItem updated = new MarketItem(itemString, prevData, plugin.db, shopLabel);
  
-		if ((updated.count < 1) || (updated.count > plugin.max_per_sale)) {
-			message.send(plugin.shop_tag + "{ERR}Invalid bundle size. (Range: 1.." + plugin.max_per_sale + ")");
-			return false;
-		}
+				if ((updated.count < 1) || (updated.count > plugin.max_per_sale)) {
+					message.send(plugin.shop_tag + "{ERR}Invalid amount. (Range: 1.." + plugin.max_per_sale + ")");
+					return false;
+				}
  
-		if (plugin.db.update(updated))
-		{
-			message.send(plugin.shop_tag + "Item {PRM}" + updated.getName() + "{} updated:");
+				if (plugin.db.update(updated))
+				{
+					message.send(plugin.shop_tag + "Item {PRM}" + updated.getName() + "{} updated:");
 			//message.send(updated.infoStringBuy());
 			//message.send(updated.infoStringSell());
 			ArrayList<String> thisList = updated.infoStringFull();
@@ -884,9 +831,9 @@ public class iListen extends PlayerListener
 		else
 		{
 			message.send(plugin.shop_tag + "Item {PRM}" + updated.getName() + "{} update {ERR}failed.");
-			return false;
-		}
-	}
+					return false;
+				}
+			}
 			
 	private boolean shopRemoveItem(String itemString, Messaging message, String shopLabel)
 	{
@@ -1012,7 +959,7 @@ public class iListen extends PlayerListener
 
 			String subCommand = args[0];
 
-			if ((args.length == 1) && (!(Misc.isAny(subCommand, new String[] {"list", "-l", "help", "-?", "idata", "reset", "reload", "exportdb", "importdb"})))) {				
+			if ((args.length == 1) && (!(Misc.isAny(subCommand, new String[] {"add","list", "-l", "help", "-?", "idata", "reset", "reload", "exportdb", "importdb"})))) {				
 				return shopShowItemInfo(args[0], message, false, shopLabel);
 			}
 			
@@ -1117,16 +1064,21 @@ public class iListen extends PlayerListener
 				}
        		}
  
-			if ((Misc.isEither(subCommand, "add", "-a")) && (args.length > 2))
+			if ((Misc.isEither(subCommand, "add", "-a")))
 			{
+				if(args.length > 2) {
 				// /shop add [id](:count) [buy] [sell] <tagList>
 				if (!(hasPermission(sender, "items.add"))) {
 					message.send("{ERR}You do not have permission to add items to the shop.");
 					return false;
 				}
 				return shopAddItem(Misc.combineSplit(1, args, " "), message, shopLabel);
+				} else {
+					showHelp(sender,"add");
+					return false;
+				}
 			}
-
+			
 			if ((Misc.isEither(subCommand, "update", "-u")) && (args.length >= 2))
 			{
 				if (!(hasPermission(sender, "items.update"))) {
@@ -1217,9 +1169,9 @@ public class iListen extends PlayerListener
 	
 	public String getCurrencyName()
 	{
-		if (plugin.econType == EconType.ICONOMY3)
+		if (plugin.econType == EconType.ICONOMY4)
 		{
-			return plugin.currency;
+			return DynamicMarket.currency;
 		}
 		
 		/*
@@ -1228,7 +1180,7 @@ public class iListen extends PlayerListener
 			try {
 				return plugin.anyConomy.getEconomyCurrencyName();
 			} catch (NoEconRegisteredException e) {
-				plugin.log.warning(Messaging.bracketize(plugin.name) + " Currency name fetched before economy registered.");
+				plugin.log.warning(Messaging.bracketize(DynamicMarket.name) + " Currency name fetched before economy registered.");
 				return "<currency>";
 			}
 		}
@@ -1239,9 +1191,9 @@ public class iListen extends PlayerListener
 	
 	public String getCurrencyNamePlural()
 	{
-		if (plugin.econType == EconType.ICONOMY3)
+		if (plugin.econType == EconType.ICONOMY4)
 		{
-			return plugin.currency + "s";
+			return DynamicMarket.currency + "s";
 		}
 		
 		/*
@@ -1250,7 +1202,7 @@ public class iListen extends PlayerListener
 			try {
 				return plugin.anyConomy.getEconomyCurrencyNamePlural();
 			} catch (NoEconRegisteredException e) {
-				plugin.log.warning(Messaging.bracketize(plugin.name) + " Currency name fetched before economy registered.");
+				plugin.log.warning(Messaging.bracketize(DynamicMarket.name) + " Currency name fetched before economy registered.");
 				return "<currencys>";
 			}
 		}

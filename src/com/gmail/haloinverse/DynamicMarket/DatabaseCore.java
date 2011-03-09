@@ -9,14 +9,14 @@ import java.util.ArrayList;
 		  
 public abstract class DatabaseCore
 {
-		public Type databaseType = null;
+		public Type database = null;
 		public String tableName; // default: SimpleMarket
 		public DynamicMarket plugin = null;
 		public String engine = "MyISAM";
-		public Connection conn = null;
+		Connection newConn;
 
-		public DatabaseCore(Type databaseType, String tableAccessed, String thisEngine, DynamicMarket thisPlugin) {
-     		this.databaseType = databaseType;
+		public DatabaseCore(Type database, String tableAccessed, String thisEngine, DynamicMarket thisPlugin) {
+     		this.database = database;
 	  		this.tableName = tableAccessed;
 	  		if (thisEngine != null)
 	  			engine = thisEngine;
@@ -26,31 +26,20 @@ public abstract class DatabaseCore
  
 		protected boolean initialize()
 		{
-			try {
-				conn = connection();
-				conn.setAutoCommit(false);
-			} catch (ClassNotFoundException ex) {
-				logSevereException("Database connector not found for " + dbTypeString(), ex);
-				conn = null;
-			} catch (SQLException ex) {
-				logSevereException("SQL Error connecting to " + dbTypeString() + "database", ex);
-				conn = null;
-			}
-			
 			return initialize("");
 		}
 		
 		protected boolean initialize(String tableSuffix) {
 			if (!(checkTable(tableSuffix))) {
-				plugin.log.info("[" + plugin.name + "] Creating database.");
-				if (createTable(tableSuffix))	
+				DynamicMarket.log.info("[" + DynamicMarket.name + "] Creating database.");
+				if (createTable())	
 				{
-					plugin.log.info("[" + plugin.name + "] Database Created.");
+					DynamicMarket.log.info("[" + DynamicMarket.name + "] Database Created.");
 					return true;
 				}
 				else
 				{
-					plugin.log.severe("[" + plugin.name + "] Database creation *failed*.");
+					DynamicMarket.log.severe("[" + DynamicMarket.name + "] Database creation *failed*.");
 					return false;
 				}
 			}
@@ -68,9 +57,9 @@ public abstract class DatabaseCore
 			myQuery.executeStatement("DROP TABLE " + tableName+tableSuffix + ";");
 			myQuery.close();
 			if (myQuery.isOK)
-				plugin.log.info("[" + plugin.name + "] Database table successfully deleted.");
+				DynamicMarket.log.info("[" + DynamicMarket.name + "] Database table successfully deleted.");
 			else
-				plugin.log.severe("[" + plugin.name + "] Database table could not be deleted.");
+				DynamicMarket.log.severe("[" + DynamicMarket.name + "] Database table could not be deleted.");
 			return myQuery.isOK;
 		}
 			
@@ -87,11 +76,11 @@ public abstract class DatabaseCore
 
  
 			protected Connection connection() throws ClassNotFoundException, SQLException {
-				if ( conn != null ) return conn;
-				
-				//CHANGED: Sets connections to auto-commit, rather than emergency commit-on-close behaviour.				
-				Connection newConn;
-				if (this.databaseType.equals(Type.SQLITE)) {
+				//CHANGED: Sets connections to auto-commit, rather than emergency commit-on-close behaviour.
+				if (newConn != null)
+					return newConn;
+					
+				if (this.database.equals(Type.SQLITE)) {
 /*  52 */       	Class.forName("org.sqlite.JDBC");
 /*  53 */       	newConn = DriverManager.getConnection(DynamicMarket.sqlite);
 					return newConn;
@@ -104,17 +93,12 @@ public abstract class DatabaseCore
 
 		protected String dbTypeString()
 		{
-			return ((this.databaseType.equals(Type.SQLITE)) ? "sqlite" : "mysql");
+			return ((this.database.equals(Type.SQLITE)) ? "sqlite" : "mysql");
 		}
 		
 		protected void logSevereException(String exDesc, Exception exDetail)
 		{
-			plugin.log.severe("[" + plugin.name + "]: " + exDesc + ": " + exDetail);
-		}
-		
-		protected void logSevereException(String exDesc)
-		{
-			plugin.log.severe("[" + plugin.name + "]: " + exDesc);
+			DynamicMarket.log.severe("[" + DynamicMarket.name + "]: " + exDesc + ": " + exDetail);
 		}
 
 		protected boolean checkTable(String tableSuffix)
@@ -132,12 +116,75 @@ public abstract class DatabaseCore
 			return checkTable("");
 		}
 					
-		protected abstract boolean createTable(String tableSuffix);
+			
+		protected boolean createTable() {
+			SQLHandler myQuery = new SQLHandler(this);
+			if (this.database.equals(Type.SQLITE))
+				myQuery.executeStatement("CREATE TABLE " + tableName + " ( id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+						"item INT NOT NULL, " +
+						"subtype INT NOT NULL, " +
+						"name TEXT NOT NULL, " +
+						"count INT NOT NULL, " +
+						"baseprice INT NOT NULL, " +
+						"canbuy INT NOT NULL, " +
+						"cansell INT NOT NULL, " +
+						"stock INT NOT NULL, " +
+						"volatility INT NOT NULL, " +
+						"salestax INT NOT NULL, " +
+						"stockhighest INT NOT NULL, " +
+						"stocklowest INT NOT NULL, " +
+						"stockfloor INT NOT NULL, " +
+						"stockceil INT NOT NULL, " +
+						"pricefloor INT NOT NULL, " +
+						"priceceil INT NOT NULL, " +
+						"jitterperc INT NOT NULL, " +
+						"driftout INT NOT NULL, " +
+						"driftin INT NOT NULL, " +
+						"avgstock INT NOT NULL, " +
+						"class INT NOT NULL, " +
+						"shoplabel TEXT NOT NULL DEFAULT '');" +
+						"CREATE INDEX itemIndex ON Market (item);" +
+						"CREATE INDEX subtypeIndex ON Market (subtype);" +
+						"CREATE INDEX nameIndex ON Market (name);" +
+						"CREATE INDEX shoplabelIndex ON Market (shoplabel)");
+			else
+				myQuery.executeStatement("CREATE TABLE " + tableName + " ( id INT( 255 ) NOT NULL AUTO_INCREMENT, " +
+						"item INT NOT NULL, " +
+						"subtype INT NOT NULL, " +
+						"name CHAR(20) NOT NULL, " +
+						"count INT NOT NULL, " +
+						"baseprice INT NOT NULL, " +
+						"stock INT NOT NULL, " +
+						"canbuy INT NOT NULL, " +
+						"cansell INT NOT NULL, " +
+						"volatility INT NOT NULL, " +
+						"salestax INT NOT NULL, " +
+						"stocklowest INT NOT NULL, " +
+						"stockhighest INT NOT NULL, " +
+						"stockfloor INT NOT NULL, " +
+						"stockceil INT NOT NULL, " +
+						"pricefloor INT NOT NULL, " +
+						"priceceil INT NOT NULL, " +
+						"jitterperc INT NOT NULL, " +
+						"driftout INT NOT NULL, " +
+						"driftin INT NOT NULL, " +
+						"avgstock INT NOT NULL, " +
+						"class INT NOT NULL, " +
+						"shoplabel CHAR(20) NOT NULL DEFAULT '', " +
+						"PRIMARY KEY ( id ), INDEX ( item, subtype, name, shoplabel )) ENGINE = "+ engine + ";");
+			myQuery.close();
+			
+			if (!myQuery.isOK)
+				return false;
+			return true;
+			
+		}
+		/*protected abstract boolean createTable(String tableSuffix);
 		
 		protected boolean createTable()
 		{
 			return createTable("");
-		}
+		}*/
 		/*
 		{
 			//SQLHandler myQuery = new SQLHandler(this);
