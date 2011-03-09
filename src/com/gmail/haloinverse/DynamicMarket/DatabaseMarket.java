@@ -385,7 +385,7 @@ public class DatabaseMarket extends DatabaseCore
 		//if (this.databaseType.equals(Type.SQLITE))
 		//	myQuery.prepareStatement("UPDATE " + tableName + " SET stock = max(stock - ?, stockfloor) WHERE (item = ? AND subtype = ? AND shoplabel = ?))");
 		//else
-			myQuery.prepareStatement("UPDATE " + tableName + " SET stock = GREATEST(stock - ?, stockfloor) WHERE (item = ? AND subtype = ? AND shoplabel = ?) LIMIT 1");
+			myQuery.prepareStatement("UPDATE " + tableName + " SET stock = GREATEST(stock - ?, stockfloor) WHERE (item = ? AND subtype = ? AND shoplabel = ?)" + ((this.databaseType.equals(Type.SQLITE)) ? "" : " LIMIT 1" ));
 		
 		myQuery.executeUpdates();
 		
