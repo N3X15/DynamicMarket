@@ -49,11 +49,9 @@ public class DatabaseMarket extends DatabaseCore {
     }
 
     protected void checkNewFields() {
-        checkColumn(
-                "shoplabel",
-                (this.databaseType.equals(Type.SQLITE) ? "TEXT NOT NULL DEFAULT '';"
-                        : "CHAR(20) NOT NULL DEFAULT ''"),
-                "CREATE INDEX shoplabelIndex ON Market (shoplabel)");
+        checkColumn( "shoplabel",
+                     (this.databaseType.equals(Type.SQLITE) ? "TEXT NOT NULL DEFAULT '';" : "CHAR(20) NOT NULL DEFAULT ''"),
+                     "CREATE INDEX shoplabelIndex ON Market (shoplabel)");
     }
 
     protected boolean createTable(String shopLabel) {
