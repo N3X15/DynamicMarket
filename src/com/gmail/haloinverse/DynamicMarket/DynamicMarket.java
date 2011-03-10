@@ -68,6 +68,7 @@ public class DynamicMarket extends JavaPlugin {
 
 
     public void onDisable() {
+        db.uninitialize();
         log.info(Messaging.bracketize(name) + " version " + Messaging.bracketize(version) + " (" + codename + ") disabled");
     }
 

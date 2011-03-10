@@ -1,13 +1,13 @@
 name: DynamicMarket
 main: com.gmail.haloinverse.DynamicMarket.DynamicMarket
-version: 0.4.8.magik.5
+version: 0.4.8.magik.6
 author: HaloInverse
 description: >
              A shop plugin building towards an interesting and flexible market system.
 commands:
     shop:
        description: Accesses the shop command system.
-       aliases: gshop
+       aliases: dshop
        usage: |
               /<command>
               /<command> help <topic/command>

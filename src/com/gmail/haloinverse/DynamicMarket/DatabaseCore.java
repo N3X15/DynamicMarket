@@ -38,6 +38,16 @@ public abstract class DatabaseCore {
 
         return initialize("");
     }
+    
+    protected void uninitialize() {
+        if ( conn != null ) {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                logSevereException("SQL error closing connection for " + dbTypeString() + "database", ex);
+            }
+        }
+    }
 
     protected boolean initialize(String tableSuffix) {
         if (!(checkTable(tableSuffix))) {
