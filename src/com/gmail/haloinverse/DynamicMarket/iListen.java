@@ -904,7 +904,7 @@ public class iListen extends PlayerListener {
                 }
             }
 
-            if ((Misc.isEither(subCommand, "add", "-a")) && (args.length > 2)) {
+            if ((Misc.isEither(subCommand, "add", "-a")) && (args.length >= 2)) {
                 // /shop add [id](:count) [buy] [sell] <tagList>
                 if (!(hasPermission(sender, "items.add"))) {
                     message.send("{ERR}You do not have permission to add items to the shop.");
