@@ -511,13 +511,13 @@ public class MarketItem extends ItemClump {
             return (numTerms * priceCeil);
 
         // Split calculation if highStockPrice < priceFloor (Some below floor)
-        if (highStockPrice < priceFloor) {
+        if (highStockPrice <= priceFloor) {
             fixedStockLimit = (int) Math.round(Math.floor(stockAtPrice(priceFloor)));
             return (((highStock - fixedStockLimit) * priceFloor) + getBatchPrice(lowStock, fixedStockLimit));
         }
 
         // Split calculation if lowStockPrice > priceCeil (Some above ceiling)
-        if (lowStockPrice > priceCeil) {
+        if (lowStockPrice >= priceCeil) {
             fixedStockLimit = (int) Math.round(Math.ceil(stockAtPrice(priceCeil)));
             return (((fixedStockLimit - lowStock) * priceCeil) + getBatchPrice(fixedStockLimit, highStock));
         }
