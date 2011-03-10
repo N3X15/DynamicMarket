@@ -803,6 +803,17 @@ public class iListen extends PlayerListener {
             }
 
             String subCommand = args[0];
+            
+            if ( (args.length == 1) && (subCommand.equalsIgnoreCase("debug")) ) {
+                SQLHandler a = new SQLHandler(plugin.db);
+                message.send("checkTable: " + (a.checkTable("Market")?"true":"false"));
+                plugin.db.uninitialize();
+                plugin.db.initialize();
+//                message.send("checkTable: " + (a.checkTable("Market")?"true":"false"));
+                SQLHandler b = new SQLHandler(plugin.db);
+                message.send("checkTable: " + (b.checkTable("Market")?"true":"false"));
+                return true;
+            }
 
             if ((args.length == 1) && (!(Misc.isAny(subCommand, new String[]{"list", "-l", "help", "-?", "idata", "reset", "reload", "exportdb", "importdb"})))) {
                 return shopShowItemInfo(args[0], message, false, shopLabel);

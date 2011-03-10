@@ -254,6 +254,7 @@ public class SQLHandler {
                 isOK = false;
             }
         }
+        
 //        if (conn != null) {
 //            try {
 //                conn.close();
@@ -262,12 +263,32 @@ public class SQLHandler {
 //                isOK = false;
 //            }
 //        }
+        
+        if (!isOK) {
+            connDB.uninitialize();
+            connDB.initialize();
+        }
     }
 
     protected void finalize() throws Throwable {
         // Just in case close() doesn't get called...
         try {
-            close();
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    connDB.logSevereException("SQL error closing resultset for " + connDB.dbTypeString() + "database", ex);
+                    isOK = false;
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException ex) {
+                    connDB.logSevereException("SQL error closing prepared statement for " + connDB.dbTypeString() + "database", ex);
+                    isOK = false;
+                }
+            }
         } finally {
             super.finalize();
         }

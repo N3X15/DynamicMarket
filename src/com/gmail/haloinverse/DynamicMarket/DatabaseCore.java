@@ -31,8 +31,7 @@ public abstract class DatabaseCore {
                     + dbTypeString(), ex);
             conn = null;
         } catch (SQLException ex) {
-            logSevereException("SQL Error connecting to " + dbTypeString()
-                    + "database", ex);
+            logSevereException("SQL Error connecting to " + dbTypeString() + "database", ex);
             conn = null;
         }
 
@@ -43,6 +42,7 @@ public abstract class DatabaseCore {
         if ( conn != null ) {
             try {
                 conn.close();
+                conn = null;
             } catch (SQLException ex) {
                 logSevereException("SQL error closing connection for " + dbTypeString() + "database", ex);
             }
