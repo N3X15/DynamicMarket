@@ -46,7 +46,7 @@
 			<manifest>
 				<attribute name="Version" value="${version}" />
 				<attribute name="Built-By" value="magik" />
-    	        <attribute name="Class-Path" value="../sqlitejdbc-v056.jar ../mysql-connector-java-5.1.14-bin.jar ../mysql-connector-java-bin.jar" />
+    	        <attribute name="Class-Path" value="./DynamicMarket/sqlitejdbc-v056.jar ./DynamicMarket/mysql-connector-java-5.1.14-bin.jar ./DynamicMarket/mysql-connector-java-bin.jar" />
 			</manifest>
 		</jar>
     	<mkdir dir="target"/>
