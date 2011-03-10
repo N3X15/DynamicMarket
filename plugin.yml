@@ -7,6 +7,7 @@ description: >
 commands:
     shop:
        description: Accesses the shop command system.
+       aliases: gshop
        usage: |
               /<command>
               /<command> help <topic/command>
