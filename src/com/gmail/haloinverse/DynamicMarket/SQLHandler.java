@@ -124,7 +124,6 @@ public class SQLHandler {
             if (ps != null) {
                 rs = ps.executeQuery();
                 conn.commit();
-                ps = null;
             }
         } catch (SQLException ex) {
             connDB.logSevereException("Error executing query statement [" + ps.toString() + "] with " + connDB.dbTypeString(), ex);
@@ -147,6 +146,8 @@ public class SQLHandler {
             rs = null;
             isOK = false;
         }
+        ps = null;
+        
     }
 
     public void executeUpdates() {
