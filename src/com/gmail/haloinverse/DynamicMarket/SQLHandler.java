@@ -27,7 +27,6 @@ public class SQLHandler {
 
         try {
             conn = connDB.connection();
-            conn.setAutoCommit(false);
         } catch (ClassNotFoundException ex) {
             connDB.logSevereException("Database connector not found for " + connDB.dbTypeString(), ex);
             conn = null;
@@ -255,40 +254,22 @@ public class SQLHandler {
             }
         }
         
-//        if (conn != null) {
-//            try {
-//                conn.close();
-//            } catch (SQLException ex) {
-//                connDB.logSevereException("SQL error closing connection for " + connDB.dbTypeString() + "database", ex);
-//                isOK = false;
-//            }
-//        }
-        
-        if (!isOK) {
-            connDB.uninitialize();
-            connDB.initialize();
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                connDB.logSevereException("SQL error closing connection for " + connDB.dbTypeString() + "database", ex);
+                isOK = false;
+            }
         }
+        
+
     }
 
     protected void finalize() throws Throwable {
         // Just in case close() doesn't get called...
         try {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    connDB.logSevereException("SQL error closing resultset for " + connDB.dbTypeString() + "database", ex);
-                    isOK = false;
-                }
-            }
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException ex) {
-                    connDB.logSevereException("SQL error closing prepared statement for " + connDB.dbTypeString() + "database", ex);
-                    isOK = false;
-                }
-            }
+            close();
         } finally {
             super.finalize();
         }

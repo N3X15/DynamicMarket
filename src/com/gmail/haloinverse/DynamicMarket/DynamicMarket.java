@@ -19,7 +19,7 @@ public class DynamicMarket extends JavaPlugin {
     public static final Logger log = Logger.getLogger("Minecraft");
 
     public static String name; // = "SimpleMarket";
-    public static String codename = "Jeanine-2";
+    public static String codename = "Shaniqua";
     public static String version; // = "0.4a";
 
     public iListen playerListener = new iListen(this);
@@ -68,7 +68,7 @@ public class DynamicMarket extends JavaPlugin {
 
 
     public void onDisable() {
-        db.uninitialize();
+//        db.uninitialize();
         log.info(Messaging.bracketize(name) + " version " + Messaging.bracketize(version) + " (" + codename + ") disabled");
     }
 

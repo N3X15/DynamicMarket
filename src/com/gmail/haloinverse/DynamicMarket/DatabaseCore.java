@@ -11,7 +11,7 @@ public abstract class DatabaseCore {
     public String tableName; // default: SimpleMarket
     public DynamicMarket plugin = null;
     public String engine = "MyISAM";
-    public Connection conn = null;
+    private static Connection conn = null;
 
     public DatabaseCore(Type databaseType, String tableAccessed, String thisEngine, DynamicMarket thisPlugin) {
         this.databaseType = databaseType;
@@ -23,30 +23,11 @@ public abstract class DatabaseCore {
     }
 
     protected boolean initialize() {
-        try {
-            conn = connection();
-            conn.setAutoCommit(false);
-        } catch (ClassNotFoundException ex) {
-            logSevereException("Database connector not found for "
-                    + dbTypeString(), ex);
-            conn = null;
-        } catch (SQLException ex) {
-            logSevereException("SQL Error connecting to " + dbTypeString() + "database", ex);
-            conn = null;
-        }
-
         return initialize("");
     }
     
     protected void uninitialize() {
-        if ( conn != null ) {
-            try {
-                conn.close();
-                conn = null;
-            } catch (SQLException ex) {
-                logSevereException("SQL error closing connection for " + dbTypeString() + "database", ex);
-            }
-        }
+
     }
 
     protected boolean initialize(String tableSuffix) {
@@ -91,22 +72,26 @@ public abstract class DatabaseCore {
     }
 
     protected Connection connection() throws ClassNotFoundException, SQLException {
-        if (conn != null)
-            return conn;
-
+        if ( (DatabaseCore.conn != null) && (!DatabaseCore.conn.isClosed()) )
+            DatabaseCore.conn.close();
+        
         // CHANGED: Sets connections to auto-commit, rather than emergency
         // commit-on-close behaviour.
         Connection newConn;
+        
         if (this.databaseType.equals(Type.SQLITE)) {
             Class.forName("org.sqlite.JDBC");
             newConn = DriverManager.getConnection(DynamicMarket.sqlite);
-            return newConn;
+            newConn.setAutoCommit(false);
+            DatabaseCore.conn = newConn;
+            return DatabaseCore.conn;
         }
 
         Class.forName("com.mysql.jdbc.Driver");
         newConn = DriverManager.getConnection(DynamicMarket.mysql, DynamicMarket.mysql_user, DynamicMarket.mysql_pass);
         newConn.setAutoCommit(true);
-        return newConn;
+        DatabaseCore.conn = newConn;
+        return DatabaseCore.conn;
     }
 
     protected String dbTypeString() {
