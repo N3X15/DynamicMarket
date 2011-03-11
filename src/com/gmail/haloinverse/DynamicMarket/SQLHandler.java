@@ -128,6 +128,22 @@ public class SQLHandler {
             }
         } catch (SQLException ex) {
             connDB.logSevereException("Error executing query statement [" + ps.toString() + "] with " + connDB.dbTypeString(), ex);
+            ex.printStackTrace();
+            
+            try {
+                connDB.logSevereException("PreparedStatement status: " + (ps.isClosed()?"closed":"open"));
+            } catch ( SQLException ex2) {
+                connDB.logSevereException("Error checking PreparedStatement status: " + ex2);
+                ex2.printStackTrace();
+            }
+
+            try {
+                connDB.logSevereException("Connection status: " + (ps.getConnection().isClosed()?"closed":"open"));
+            } catch ( SQLException ex2) {
+                connDB.logSevereException("Error checking connection status: " + ex2);
+                ex2.printStackTrace();
+            }
+            
             rs = null;
             isOK = false;
         }
