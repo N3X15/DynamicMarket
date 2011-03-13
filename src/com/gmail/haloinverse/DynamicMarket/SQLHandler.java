@@ -64,6 +64,7 @@ public class SQLHandler {
             }
         } catch (SQLException ex) {
             connDB.logSevereException("Error preparing query statement [" + sqlString + "] for " + connDB.dbTypeString(), ex);
+            ex.printStackTrace();
             ps = null;
             isOK = false;
         }
@@ -89,6 +90,7 @@ public class SQLHandler {
             }
         } catch (SQLException ex) {
             connDB.logSevereException("Error preparing query statement [" + sqlString + "] for " + connDB.dbTypeString(), ex);
+            ex.printStackTrace();
             ps = null;
             isOK = false;
         }
@@ -271,14 +273,14 @@ public class SQLHandler {
             }
         }
         
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException ex) {
-                connDB.logSevereException("SQL error closing connection for " + connDB.dbTypeString() + "database", ex);
-                isOK = false;
-            }
-        }
+//        if (conn != null) {
+//            try {
+//                conn.close();
+//            } catch (SQLException ex) {
+//                connDB.logSevereException("SQL error closing connection for " + connDB.dbTypeString() + "database", ex);
+//                isOK = false;
+//            }
+//        }
         
 
     }

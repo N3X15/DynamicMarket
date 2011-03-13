@@ -72,8 +72,17 @@ public abstract class DatabaseCore {
     }
 
     protected Connection connection() throws ClassNotFoundException, SQLException {
-        if ( (DatabaseCore.conn != null) && (!DatabaseCore.conn.isClosed()) )
-            DatabaseCore.conn.close();
+//    	DynamicMarket.log.info("connection: " +
+//    			               "null? " + ((DatabaseCore.conn == null)?"true":"false") + 
+//    			               " isClosed? " + (((DatabaseCore.conn != null) && DatabaseCore.conn.isClosed())?"true":"false"));
+//    	new Throwable().printStackTrace();
+    	
+    	
+    	
+        if ( (DatabaseCore.conn != null) && (!DatabaseCore.conn.isClosed()) ){
+        	return DatabaseCore.conn;
+        }
+        
         
         // CHANGED: Sets connections to auto-commit, rather than emergency
         // commit-on-close behaviour.
@@ -89,7 +98,7 @@ public abstract class DatabaseCore {
 
         Class.forName("com.mysql.jdbc.Driver");
         newConn = DriverManager.getConnection(DynamicMarket.mysql, DynamicMarket.mysql_user, DynamicMarket.mysql_pass);
-        newConn.setAutoCommit(true);
+        newConn.setAutoCommit(false);
         DatabaseCore.conn = newConn;
         return DatabaseCore.conn;
     }
@@ -107,9 +116,9 @@ public abstract class DatabaseCore {
     }
 
     protected boolean checkTable(String tableSuffix) {
-        SQLHandler myQuery = new SQLHandler(this);
-
         boolean bool;
+        SQLHandler myQuery = new SQLHandler(this);
+        
         bool = myQuery.checkTable(tableName + tableSuffix);
         myQuery.close();
         return bool;

@@ -55,8 +55,10 @@ public class DatabaseMarket extends DatabaseCore {
         if (!myQuery.checkTable(tableName)) {
             myQuery.close();
             return createTable();
-        } else
+        } else {
+            myQuery.close();
             return false;
+        }
     }
 
     protected boolean createTable() {
