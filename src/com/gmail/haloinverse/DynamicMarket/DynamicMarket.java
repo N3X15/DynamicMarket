@@ -83,6 +83,10 @@ public class DynamicMarket extends JavaPlugin {
         version = desc.getVersion();
 
         directory = getDataFolder() + File.separator;
+        if ( !directory.equals("plugins" + File.separator + "DynamicMarket" + File.separator) ) {
+            directory = "plugins" + File.separator + "DynamicMarket" + File.separator;
+        	log.warning("Jar is not named DynamicMarket.jar!  Beware of multiple DynamicMarket instances being loaded!");
+        }
         sqlite = "jdbc:sqlite:" + directory + "shop.db";
 
 	  	PluginManager pm = getServer().getPluginManager();
