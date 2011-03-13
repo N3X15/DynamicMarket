@@ -29,7 +29,7 @@ public class DynamicMarket extends JavaPlugin {
     public static Permissions Permissions = null;
     
     public static iProperty Settings;
-    public static String directory; // = "DynamicMarket" + File.separator;
+    public static File directory = null;
 
     protected static String currency;// = "Coin";
     protected static boolean econLoaded = false;
@@ -44,7 +44,7 @@ public class DynamicMarket extends JavaPlugin {
     public String defaultShopAccount = "";
     public boolean defaultShopAccountFree = true;
     protected static String database_type = "sqlite";
-    protected static String sqlite = "jdbc:sqlite:" + directory + "shop.db";
+    protected static String sqlite = "jdbc:sqlite:" + "plugins/DynamicMarket/shop.db";
     protected static String mysql = "jdbc:mysql://localhost:3306/minecraft";
     protected static String mysql_user = "root";
     protected static String mysql_pass = "pass";
@@ -73,14 +73,17 @@ public class DynamicMarket extends JavaPlugin {
     }
 
     public File getDataFolder() {
-        directory = super.getDataFolder() + File.separator;
-        if ( !directory.equals("plugins" + File.separator + "DynamicMarket" + File.separator) ) {
-        	directory = "plugins" + File.separator + "DynamicMarket";
-        	log.warning("Jar is not named DynamicMarket.jar!  Beware of multiple DynamicMarket instances being loaded!");
-        }
-
-        File dir = new File(directory);
-        return dir;
+    	if ( directory == null ) {
+    		String pluginDirString = "plugins" + File.separator + "DynamicMarket";
+		    if ( !super.getDataFolder().toString().equals(pluginDirString) ) {
+		    	log.warning("Jar is not named DynamicMarket.jar!  Beware of multiple DynamicMarket instances being loaded!");
+		    	directory = new File(pluginDirString);
+		    } else {
+		    	directory = super.getDataFolder();
+		    }
+    	}
+    	
+        return directory;
     }
     
     @Override
@@ -93,12 +96,7 @@ public class DynamicMarket extends JavaPlugin {
         name = desc.getName();
         version = desc.getVersion();
         
-        getDataFolder();
-
-
-        directory = getDataFolder() + File.separator;
-        
-        sqlite = "jdbc:sqlite:" + directory + "shop.db";
+        sqlite = "jdbc:sqlite:" + directory + File.separator + "shop.db";
 
 	  	PluginManager pm = getServer().getPluginManager();
 	  	if(pm.getPlugin("iConomy").isEnabled() && DynamicMarket.iC == null) {

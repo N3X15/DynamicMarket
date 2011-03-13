@@ -490,11 +490,11 @@ public class MarketItem extends ItemClump {
 
         // Split calculation if stockFloor reached by lowStock (Some below floor)
         if (lowStock < stockFloor)
-            return (((stockFloor - lowStock) * getStockPrice(stockFloor)) + getBatchPrice(stockFloor, highStock));
+            return (((stockFloor - lowStock + 1) * getStockPrice(stockFloor)) + getBatchPrice(stockFloor + 1, highStock));
 
         // Split calculation if stockCeil reached by highStock (Some above ceiling)
         if (highStock > stockCeil)
-            return (((highStock - stockCeil) * getStockPrice(stockCeil)) + getBatchPrice(lowStock, stockCeil));
+            return (((highStock - stockCeil + 1) * getStockPrice(stockCeil)) + getBatchPrice(lowStock, stockCeil - 1));
 
         lowStockPrice = getStockPrice(lowStock); // highest price in range
         highStockPrice = getStockPrice(highStock); // lowest price in range
@@ -511,15 +511,15 @@ public class MarketItem extends ItemClump {
             return (numTerms * priceCeil);
 
         // Split calculation if highStockPrice < priceFloor (Some below floor)
-        if (highStockPrice <= priceFloor) {
+        if (highStockPrice < priceFloor) {
             fixedStockLimit = (int) Math.round(Math.floor(stockAtPrice(priceFloor)));
-            return (((highStock - fixedStockLimit) * priceFloor) + getBatchPrice(lowStock, fixedStockLimit));
+            return (((highStock - fixedStockLimit + 1) * priceFloor) + getBatchPrice(lowStock, fixedStockLimit - 1));
         }
 
         // Split calculation if lowStockPrice > priceCeil (Some above ceiling)
-        if (lowStockPrice >= priceCeil) {
+        if (lowStockPrice > priceCeil) {
             fixedStockLimit = (int) Math.round(Math.ceil(stockAtPrice(priceCeil)));
-            return (((fixedStockLimit - lowStock) * priceCeil) + getBatchPrice(fixedStockLimit, highStock));
+            return (((fixedStockLimit - lowStock + 1) * priceCeil) + getBatchPrice(fixedStockLimit + 1, highStock));
         }
 
 
@@ -531,13 +531,12 @@ public class MarketItem extends ItemClump {
 
     public int getBuyPrice(int numBundles) {
         // Return the purchase price of the given number of bundles.
-        getBatchPrice(stock, stock + numBundles - 1);
         return (int) Math.round(Math.ceil(getBatchPrice(stock, stock - numBundles + 1)));
     }
 
     public int getSellPrice(int numBundles) {
         // Return the selling price of the given number of bundles.
-        return (int) Math.round(Math.floor(deductTax(getBatchPrice(stock + numBundles, stock + 1))));
+        return (int) Math.round(Math.floor(deductTax(getBatchPrice(stock, stock + numBundles - 1))));
     }
 
     private double deductTax(double basePrice) {
