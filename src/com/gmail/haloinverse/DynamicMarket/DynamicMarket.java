@@ -72,6 +72,17 @@ public class DynamicMarket extends JavaPlugin {
         log.info(Messaging.bracketize(name) + " version " + Messaging.bracketize(version) + " (" + codename + ") disabled");
     }
 
+    public File getDataFolder() {
+        directory = super.getDataFolder() + File.separator;
+        if ( !directory.equals("plugins" + File.separator + "DynamicMarket" + File.separator) ) {
+        	directory = "plugins" + File.separator + "DynamicMarket";
+        	log.warning("Jar is not named DynamicMarket.jar!  Beware of multiple DynamicMarket instances being loaded!");
+        }
+
+        File dir = new File(directory);
+        return dir;
+    }
+    
     @Override
     public void onEnable() {
         PluginDescriptionFile desc = getDescription();
@@ -81,12 +92,12 @@ public class DynamicMarket extends JavaPlugin {
         
         name = desc.getName();
         version = desc.getVersion();
+        
+        getDataFolder();
+
 
         directory = getDataFolder() + File.separator;
-        if ( !directory.equals("plugins" + File.separator + "DynamicMarket" + File.separator) ) {
-            directory = "plugins" + File.separator + "DynamicMarket" + File.separator;
-        	log.warning("Jar is not named DynamicMarket.jar!  Beware of multiple DynamicMarket instances being loaded!");
-        }
+        
         sqlite = "jdbc:sqlite:" + directory + "shop.db";
 
 	  	PluginManager pm = getServer().getPluginManager();
