@@ -183,6 +183,10 @@ public class DynamicMarket extends JavaPlugin {
             return true;
         }
     }
+    
+    public void enableWrapperMode() {
+    	wrapperMode = true;
+    }
 
     public boolean wrapperCommand(CommandSender sender, String cmd, String[] args, String shopLabel, String accountName, boolean freeAccount) {
         return this.playerListener.parseCommand(sender, cmd, args, (shopLabel == null ? "" : shopLabel), accountName, freeAccount);
