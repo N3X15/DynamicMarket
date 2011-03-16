@@ -790,7 +790,7 @@ public class iListen extends PlayerListener {
 
         // if (commandName.equals("shop")) {
         // if (cmd.getName().toLowerCase().equals("shop")) {
-        if (cmd.toLowerCase().equals("dshop")) {
+        if (cmd.toLowerCase().equals("shop") || cmd.toLowerCase().equals("dshop")) {
 
             if (!hasPermission(sender, "access")) {
                 message.send("{ERR}You do not have permission to access the shop.");
