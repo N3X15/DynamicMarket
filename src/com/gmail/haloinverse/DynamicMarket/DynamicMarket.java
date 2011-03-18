@@ -3,6 +3,8 @@ package com.gmail.haloinverse.DynamicMarket;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.coelho.iConomy.iConomy;
 import java.io.File;
+import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Timer;
 import java.util.logging.Logger;
 import org.bukkit.command.Command;
@@ -34,8 +36,10 @@ public class DynamicMarket extends JavaPlugin {
     protected static String currency;// = "Coin";
     protected static boolean econLoaded = false;
 
-    protected static boolean wrapperMode = false;
+//    protected static boolean wrapperMode = false;
     protected static boolean wrapperPermissions = false;
+    protected static LinkedList<JavaPlugin> wrappers = new LinkedList<JavaPlugin>();    
+    
     protected static boolean simplePermissions = false;
 
     public String shop_tag = "{BKT}[{}Shop{BKT}]{} ";
@@ -175,17 +179,17 @@ public class DynamicMarket extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        if (!wrapperMode) {
-            boolean thisReturn;
-            thisReturn = this.playerListener.parseCommand(sender, cmd.getName(), args, "", defaultShopAccount, defaultShopAccountFree);
-            return thisReturn;
-        } else {
-            return true;
+        ListIterator<JavaPlugin> itr = DynamicMarket.wrappers.listIterator();
+        while(itr.hasNext()) {
+            JavaPlugin wrap = itr.next();
+            if ( wrap.onCommand(sender, cmd, commandLabel, args) ) return true;
         }
+        return this.playerListener.parseCommand(sender, cmd.getName(), args, "", defaultShopAccount, defaultShopAccountFree);
     }
     
-    public void enableWrapperMode() {
-    	wrapperMode = true;
+    public void hookWrapper(JavaPlugin wrap) {
+    	DynamicMarket.wrappers.add(wrap);
+    	log.info(Messaging.bracketize(name) + " wrapper mode enabled by " + wrap.getDescription().getName());    	
     }
 
     public boolean wrapperCommand(CommandSender sender, String cmd, String[] args, String shopLabel, String accountName, boolean freeAccount) {
@@ -226,7 +230,7 @@ public class DynamicMarket extends JavaPlugin {
 
         csvFileName = Settings.getString("csv-file", "shopDB.csv");
         csvFilePath = Settings.getString("csv-file-path", getDataFolder() + File.separator);
-        wrapperMode = Settings.getBoolean("wrapper-mode", false);
+//        wrapperMode = Settings.getBoolean("wrapper-mode", false);
         simplePermissions = Settings.getBoolean("simple-permissions", false);
         wrapperPermissions = Settings.getBoolean("wrapper-permissions", false);
 
