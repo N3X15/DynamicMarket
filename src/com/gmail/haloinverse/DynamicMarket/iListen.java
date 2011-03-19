@@ -23,7 +23,7 @@ public class iListen extends PlayerListener {
         plugin = instance;
     }
 
-    private boolean hasPermission(CommandSender sender, String permString) {
+    public boolean hasPermission(CommandSender sender, String permString) {
         //TODO: check this if - looks wrong....
         if (DynamicMarket.simplePermissions || DynamicMarket.Permissions == null) {
             if (sender instanceof Player) {
