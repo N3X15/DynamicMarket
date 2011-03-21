@@ -35,6 +35,8 @@ public class DynamicMarket extends JavaPlugin {
 
     protected static String currency;// = "Coin";
     protected static boolean econLoaded = false;
+    
+    protected static boolean debug = false;
 
 //    protected static boolean wrapperMode = false;
     protected static boolean wrapperPermissions = false;
@@ -233,6 +235,7 @@ public class DynamicMarket extends JavaPlugin {
 //        wrapperMode = Settings.getBoolean("wrapper-mode", false);
         simplePermissions = Settings.getBoolean("simple-permissions", false);
         wrapperPermissions = Settings.getBoolean("wrapper-permissions", false);
+        debug = Settings.getBoolean("debug", false);
 
         Messaging.colNormal = "&" + Settings.getString("text-colour-normal", "e");
         Messaging.colCmd = "&" + Settings.getString("text-colour-command", "f");

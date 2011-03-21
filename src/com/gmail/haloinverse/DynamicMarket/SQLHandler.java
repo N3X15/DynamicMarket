@@ -5,6 +5,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.util.ArrayList;
 import java.sql.Statement;
 
@@ -26,6 +27,7 @@ public class SQLHandler {
         connDB = thisDB;
 
         try {
+            if ( DynamicMarket.debug ) DynamicMarket.log.info("SQLHandler constructor - trying connection to DB");            
             conn = connDB.connection();
         } catch (ClassNotFoundException ex) {
             connDB.logSevereException("Database connector not found for " + connDB.dbTypeString(), ex);
@@ -36,11 +38,13 @@ public class SQLHandler {
             conn = null;
             isOK = false;
         }
+        
         ps = null;
         rs = null;
     };
 
     public void prepareStatement(String sqlString) {
+        if ( DynamicMarket.debug ) DynamicMarket.log.info("SQLHandler:prepareStatement(\""+sqlString+"\")");
         try {
             // Store previous prepareStatement, if one was already prepared.
             
@@ -125,6 +129,20 @@ public class SQLHandler {
             rs = null;
             if (ps != null) {
                 rs = ps.executeQuery();
+                if ( DynamicMarket.debug ) {
+                    DynamicMarket.log.info("ps.executeQuery() called");
+                    SQLWarning sw = rs.getWarnings();
+                    while ( sw != null ) {
+                        DynamicMarket.log.info(sw.getMessage());
+                        sw = sw.getNextWarning();
+                    }
+                    sw = ps.getWarnings();
+                    while ( sw != null ) {
+                        DynamicMarket.log.info(sw.getMessage());
+                        sw = sw.getNextWarning();
+                    }
+                }
+
                 conn.commit();
             }
         } catch (SQLException ex) {
@@ -146,6 +164,7 @@ public class SQLHandler {
             }
             
             rs = null;
+            conn = null;
             isOK = false;
         }
         ps = null;

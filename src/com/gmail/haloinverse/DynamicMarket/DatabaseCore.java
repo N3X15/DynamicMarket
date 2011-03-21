@@ -3,6 +3,7 @@ package com.gmail.haloinverse.DynamicMarket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.util.ArrayList;
 
 public abstract class DatabaseCore {
@@ -76,13 +77,27 @@ public abstract class DatabaseCore {
 //    			               "null? " + ((DatabaseCore.conn == null)?"true":"false") + 
 //    			               " isClosed? " + (((DatabaseCore.conn != null) && DatabaseCore.conn.isClosed())?"true":"false"));
 //    	new Throwable().printStackTrace();
-    	
-    	
+        
+        if ( DynamicMarket.debug ) DynamicMarket.log.info("DatabaseCore:connection() called");
     	
         if ( (DatabaseCore.conn != null) && (!DatabaseCore.conn.isClosed()) ){
-        	return DatabaseCore.conn;
+            boolean bad = false;
+            SQLWarning sw = conn.getWarnings();
+            while ( sw != null ) {
+                bad = true;
+                DynamicMarket.log.info("leftover warning: "+sw.getMessage());
+                sw = sw.getNextWarning();
+            }
+            if ( bad ) {
+                if ( DynamicMarket.debug ) DynamicMarket.log.info("DatabaseCore:connection() not re-using connection");
+                conn = null;
+            } else {
+                if ( DynamicMarket.debug ) DynamicMarket.log.info("DatabaseCore:connection() returning last connection");
+                return DatabaseCore.conn;
+            }
         }
         
+        if ( DynamicMarket.debug ) DynamicMarket.log.info("DatabaseCore:connection() new connection");
         
         // CHANGED: Sets connections to auto-commit, rather than emergency
         // commit-on-close behaviour.
