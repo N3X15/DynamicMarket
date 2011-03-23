@@ -27,10 +27,6 @@ public abstract class DatabaseCore {
         return initialize("");
     }
     
-    protected void uninitialize() {
-
-    }
-
     protected boolean initialize(String tableSuffix) {
         if (!(checkTable(tableSuffix))) {
             DynamicMarket.log.info("[" + DynamicMarket.name + "] Creating database.");
@@ -106,7 +102,7 @@ public abstract class DatabaseCore {
         if (this.databaseType.equals(Type.SQLITE)) {
             Class.forName("org.sqlite.JDBC");
             newConn = DriverManager.getConnection(DynamicMarket.sqlite);
-            newConn.setAutoCommit(false);
+            newConn.setAutoCommit(true);
             DatabaseCore.conn = newConn;
             return DatabaseCore.conn;
         }

@@ -143,7 +143,7 @@ public class SQLHandler {
                     }
                 }
 
-                conn.commit();
+                if (!conn.getAutoCommit()) conn.commit();
             }
         } catch (SQLException ex) {
             connDB.logSevereException("Error executing query statement [" + ps.toString() + "] with " + connDB.dbTypeString(), ex);
@@ -180,6 +180,8 @@ public class SQLHandler {
                 ps = null;
             }
             if (!psList.isEmpty()) {
+                boolean autoCommit = conn.getAutoCommit();
+                conn.setAutoCommit(false);
                 for (PreparedStatement thisPs : psList) {
                     ps = thisPs;
                     thisPs.executeUpdate();
@@ -188,6 +190,7 @@ public class SQLHandler {
                 // Clear list once finished execution.
                 psList.clear();
                 conn.commit();
+                conn.setAutoCommit(autoCommit);
             }
         } catch (SQLException ex) {
             connDB.logSevereException("Error executing update statement [" + ps.toString() + "] with " + connDB.dbTypeString(), ex);
@@ -201,7 +204,7 @@ public class SQLHandler {
             try {
                 st = conn.createStatement();
                 st.executeUpdate(sqlStatement);
-                conn.commit();
+                if (!conn.getAutoCommit()) conn.commit();
             } catch (SQLException ex) {
                 connDB.logSevereException("Error executing statement [" + sqlStatement + "] with " + connDB.dbTypeString(), ex);
                 isOK = false;

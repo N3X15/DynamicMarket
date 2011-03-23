@@ -66,17 +66,26 @@ public class DatabaseMarket extends DatabaseCore {
         if (this.databaseType.equals(Type.SQLITE)) {
             myQuery.executeStatement("CREATE TABLE " + tableName
                     + " ( id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + "item INT NOT NULL, " + "subtype INT NOT NULL, "
-                    + "name TEXT NOT NULL, " + "count INT NOT NULL, "
-                    + "baseprice INT NOT NULL, " + "canbuy INT NOT NULL, "
-                    + "cansell INT NOT NULL, " + "stock INT NOT NULL, "
-                    + "volatility INT NOT NULL, " + "salestax INT NOT NULL, "
+                    + "item INT NOT NULL, " 
+                    + "subtype INT NOT NULL, "
+                    + "name TEXT NOT NULL, " 
+                    + "count INT NOT NULL, "
+                    + "baseprice INT NOT NULL, " 
+                    + "canbuy INT NOT NULL, "
+                    + "cansell INT NOT NULL, " 
+                    + "stock INT NOT NULL, "
+                    + "volatility INT NOT NULL, " 
+                    + "salestax INT NOT NULL, "
                     + "stockhighest INT NOT NULL, "
                     + "stocklowest INT NOT NULL, "
-                    + "stockfloor INT NOT NULL, " + "stockceil INT NOT NULL, "
-                    + "pricefloor INT NOT NULL, " + "priceceil INT NOT NULL, "
-                    + "jitterperc INT NOT NULL, " + "driftout INT NOT NULL, "
-                    + "driftin INT NOT NULL, " + "avgstock INT NOT NULL, "
+                    + "stockfloor INT NOT NULL, " 
+                    + "stockceil INT NOT NULL, "
+                    + "pricefloor INT NOT NULL, " 
+                    + "priceceil INT NOT NULL, "
+                    + "jitterperc INT NOT NULL, " 
+                    + "driftout INT NOT NULL, "
+                    + "driftin INT NOT NULL, " 
+                    + "avgstock INT NOT NULL, "
                     + "class INT NOT NULL, "
                     + "shoplabel TEXT NOT NULL DEFAULT '');"
                     + "CREATE INDEX itemIndex ON Market (item);"
@@ -228,19 +237,19 @@ public class DatabaseMarket extends DatabaseCore {
 
         if ((nameFilter == null) || (nameFilter.isEmpty())) {
             myQuery.inputList.add(shopLabel);
-            myQuery.inputList.add(startItem);
             myQuery.inputList.add(numItems);
+            myQuery.inputList.add(startItem);
             myQuery.prepareStatement("SELECT * FROM "
                     + tableName
-                    + " WHERE (item >= 0 AND shoplabel = ?) ORDER BY item ASC, subtype ASC LIMIT ?, ?");
+                    + " WHERE (item >= 0 AND shoplabel = ?) ORDER BY item ASC, subtype ASC LIMIT ? OFFSET ?");
         } else {
             myQuery.inputList.add("%" + nameFilter + "%");
             myQuery.inputList.add(shopLabel);
-            myQuery.inputList.add(startItem);
             myQuery.inputList.add(numItems);
+            myQuery.inputList.add(startItem);
             myQuery.prepareStatement("SELECT * FROM "
                     + tableName
-                    + " WHERE (item >= 0 AND name LIKE ? AND shoplabel = ?) ORDER BY item ASC, subtype ASC LIMIT ?, ?");
+                    + " WHERE (item >= 0 AND name LIKE ? AND shoplabel = ?) ORDER BY item ASC, subtype ASC LIMIT ? OFFSET ?");
         }
 
         myQuery.executeQuery();

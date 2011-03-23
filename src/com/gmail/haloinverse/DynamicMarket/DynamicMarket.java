@@ -209,6 +209,8 @@ public class DynamicMarket extends JavaPlugin {
     public void setup() {
         Settings = new iProperty(getDataFolder() + File.separator + name + ".settings");
 
+        debug = Settings.getBoolean("debug", false);
+
         // ItemsFile = new iProperty("items.db");
         itemsPath = Settings.getString("items-db-path", getDataFolder() + File.separator);
         items = new Items(itemsPath + "items.db", this);
@@ -227,6 +229,12 @@ public class DynamicMarket extends JavaPlugin {
         if (DynamicMarket.database_type.equalsIgnoreCase("mysql")) {
             db = new DatabaseMarket(DatabaseMarket.Type.MYSQL, "Market", items, mysql_dbEngine, this);
         } else {
+            try {
+                Class.forName("org.sqlite.JDBC");
+            } catch(ClassNotFoundException ex) {
+                log.info("org.sqlite.JDBC class not found!");
+                ex.printStackTrace();
+            }
             db = new DatabaseMarket(DatabaseMarket.Type.SQLITE, "Market", items, "", this);
         }
 
@@ -235,7 +243,6 @@ public class DynamicMarket extends JavaPlugin {
 //        wrapperMode = Settings.getBoolean("wrapper-mode", false);
         simplePermissions = Settings.getBoolean("simple-permissions", false);
         wrapperPermissions = Settings.getBoolean("wrapper-permissions", false);
-        debug = Settings.getBoolean("debug", false);
 
         Messaging.colNormal = "&" + Settings.getString("text-colour-normal", "e");
         Messaging.colCmd = "&" + Settings.getString("text-colour-command", "f");
