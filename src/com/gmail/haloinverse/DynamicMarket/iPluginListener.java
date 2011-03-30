@@ -3,7 +3,7 @@ package com.gmail.haloinverse.DynamicMarket;
 import com.nijiko.coelho.iConomy.iConomy;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
-import org.bukkit.event.server.PluginEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerListener;
 import org.bukkit.plugin.Plugin;
  
@@ -22,7 +22,7 @@ public class iPluginListener extends ServerListener {
 	public iPluginListener() { }
  
     @Override
-    public void onPluginEnabled(PluginEvent event) {
+    public void onPluginEnable(PluginEnableEvent event) {
     	if(event.getPlugin().getDescription().getName().equals("iConomy")) {
 	        if(DynamicMarket.getiConomy() == null) {
 	            Plugin iConomy = DynamicMarket.getTheServer().getPluginManager().getPlugin("iConomy");
