@@ -36,7 +36,7 @@ public class DynamicMarket extends JavaPlugin {
     protected static String currency;// = "Coin";
     protected static boolean econLoaded = false;
     
-    protected static boolean debug = false;
+    public static boolean debug = false;
 
 //    protected static boolean wrapperMode = false;
     protected static boolean wrapperPermissions = false;
