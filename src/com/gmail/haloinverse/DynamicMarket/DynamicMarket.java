@@ -227,6 +227,12 @@ public class DynamicMarket extends JavaPlugin {
         mysql_dbEngine = Settings.getString("mysql-dbengine", mysql_dbEngine);
 
         if (DynamicMarket.database_type.equalsIgnoreCase("mysql")) {
+            try { 
+                Class.forName("com.mysql.jdbc.Driver");
+            } catch(ClassNotFoundException ex) {
+                log.info("com.mysql.jdbc.Driver class not found!");
+                ex.printStackTrace();
+            }
             db = new DatabaseMarket(DatabaseMarket.Type.MYSQL, "Market", items, mysql_dbEngine, this);
         } else {
             try {
