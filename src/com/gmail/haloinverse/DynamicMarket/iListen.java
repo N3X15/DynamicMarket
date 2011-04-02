@@ -408,7 +408,7 @@ public class iListen extends PlayerListener {
             if (plugin.econType == EconType.ICONOMY4) {
                 Account thisAccount = iConomy.getBank().getAccount(name);
                 thisAccount.add(amount);
-                thisAccount.save();
+//                thisAccount.save();
             }
         }
     }
