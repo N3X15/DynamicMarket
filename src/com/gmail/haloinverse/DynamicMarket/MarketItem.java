@@ -531,12 +531,12 @@ public class MarketItem extends ItemClump {
 
     public int getBuyPrice(int numBundles) {
         // Return the purchase price of the given number of bundles.
-        return (int) Math.round(Math.ceil(getBatchPrice(stock, stock - numBundles + 1)));
+        return (int) Math.round(Math.ceil(getBatchPrice(stock, stock - numBundles)));
     }
 
     public int getSellPrice(int numBundles) {
         // Return the selling price of the given number of bundles.
-        return (int) Math.round(Math.floor(deductTax(getBatchPrice(stock, stock + numBundles - 1))));
+        return (int) Math.round(Math.floor(deductTax(getBatchPrice(stock + 1, stock + numBundles + 1))));
     }
 
     private double deductTax(double basePrice) {
