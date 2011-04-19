@@ -49,14 +49,14 @@ public class Messaging {
 
     public static String stripHighlights(String original) {
         return original.replace("{}", "").replace("{CMD}", "").replace("{BKT}", "").replace("{ERR}", "").replace("{PRM}", "");
-    }
+    }	
 
     public static String parse(String original) {
-        return parseHighlights(original).replaceAll("(&([a-z0-9]))", "§$2").replace("&&", "&");
+        return parseHighlights(original).replaceAll("(&([a-z0-9]))", "\u00A7$2").replace("&&", "&");
     }
 
     public static String colorize(String original) {
-        return original.replace("<black>", "§0").replace("<navy>", "§1").replace("<green>", "§2").replace("<teal>", "§3").replace("<red>", "§4").replace("<purple>", "§5").replace("<gold>", "§6").replace("<silver>", "§7").replace("<gray>", "§8").replace("<blue>", "§9").replace("<lime>", "§a").replace("<aqua>", "§b").replace("<rose>", "§c").replace("<pink>", "§d").replace("<yellow>", "§e").replace("<white>", "§f");
+        return original.replace("<black>", "&0").replace("<navy>", "&1").replace("<green>", "&2").replace("<teal>", "&3").replace("<red>", "&4").replace("<purple>", "&5").replace("<gold>", "&6").replace("<silver>", "&7").replace("<gray>", "&8").replace("<blue>", "&9").replace("<lime>", "&a").replace("<aqua>", "&b").replace("<rose>", "&c").replace("<pink>", "&d").replace("<yellow>", "&e").replace("<white>", "&f");
     }
 
     public static String bracketize(String message) {

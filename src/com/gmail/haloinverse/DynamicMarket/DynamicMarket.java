@@ -2,6 +2,8 @@ package com.gmail.haloinverse.DynamicMarket;
 
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.coelho.iConomy.iConomy;
+import com.nijiko.permissions.PermissionHandler;
+
 import java.io.File;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -28,7 +30,7 @@ public class DynamicMarket extends JavaPlugin {
 
     public static Server server = null;
     public static iConomy iC = null;
-    public static Permissions Permissions = null;
+    public static PermissionHandler Permissions = null;
     
     public static iProperty Settings;
     public static File directory = null;
@@ -112,7 +114,7 @@ public class DynamicMarket extends JavaPlugin {
 	  		iC = (iConomy)iConomy;
 	  	}
 	  	if(pm.getPlugin("Permissions").isEnabled() && DynamicMarket.Permissions == null) {
-	  		DynamicMarket.Permissions = ((Permissions)Permissions);
+	  		setupPermissions();
     		System.out.println("[DynamicMarket] Successfully linked with Permissions.");	  		
 	  	}
 	  	pluginListener = new iPluginListener();
@@ -121,13 +123,14 @@ public class DynamicMarket extends JavaPlugin {
 
         checkLibs();
         setup();
+        
         log.info(Messaging.bracketize(name) + " version " + Messaging.bracketize(version) + " (" + codename + ") enabled");
     }
 
     public static Server getTheServer() {
         return server;
     }
-
+    
     public static iConomy getiConomy() {
         return iC;
     }
@@ -144,17 +147,13 @@ public class DynamicMarket extends JavaPlugin {
         return true;
     }
 
-    public static Permissions getPermissions() {
-        return Permissions;
-    }
 
-    public static boolean setPermissions(Permissions plugin) {
-        if (Permissions == null) {
-            Permissions = plugin;
-        } else {
-            return false;
-        }
-        return true;
+    public static void setupPermissions() {
+    	Plugin test = getTheServer().getPluginManager().getPlugin("Permissions");
+        if (Permissions == null) 
+        	if ( test != null )
+        		DynamicMarket.Permissions = ((Permissions)test).getHandler();
+        
     }
     
 	private void checkLibs() {

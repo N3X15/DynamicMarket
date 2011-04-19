@@ -1,8 +1,6 @@
 package com.gmail.haloinverse.DynamicMarket;
 
 import com.nijiko.coelho.iConomy.iConomy;
-import com.nijikokun.bukkit.Permissions.Permissions;
-
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerListener;
 import org.bukkit.plugin.Plugin;
@@ -33,11 +31,10 @@ public class iPluginListener extends ServerListener {
 	        }
     	}
     	if(event.getPlugin().getDescription().getName().equals("Permissions")) {
-	        if(DynamicMarket.getPermissions() == null) {
+	        if( DynamicMarket.Permissions == null) {
 	        	Plugin Permissions = DynamicMarket.getTheServer().getPluginManager().getPlugin("Permissions");
-	        	
 	        	if(Permissions != null) {
-	        		DynamicMarket.setPermissions((Permissions)Permissions);
+	        		DynamicMarket.setupPermissions();
 	        		System.out.println("[DynamicMarket] Successfully linked with Permissions.");
 	        	}
 	        }

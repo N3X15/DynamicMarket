@@ -26,6 +26,7 @@ public class iListen extends PlayerListener {
     public boolean hasPermission(CommandSender sender, String permString) {
         //TODO: check this if - looks wrong....
         if (DynamicMarket.simplePermissions || DynamicMarket.Permissions == null) {
+        	DynamicMarket.log.info("[DynamicMarket] - Null Permission Detected when attempting command.");
             if (sender instanceof Player) {
                 if (Misc.isAny(permString, new String[]{"access", "buy", "sell"})) {
                     return true;
@@ -100,7 +101,7 @@ public class iListen extends PlayerListener {
                 topics += " tags";
             }
 
-            message.send("{} Commands: {CMD}" + commands);
+            message.send("{} Commands: {CMD}" + commands);	
             message.send("{} Shortcuts: {CMD}" + shortcuts);
             message.send("{} Other help topics: {PRM}" + topics);
             return true;
