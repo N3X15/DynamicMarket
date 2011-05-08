@@ -1,6 +1,6 @@
 package com.gmail.haloinverse.DynamicMarket;
 
-import com.nijiko.coelho.iConomy.iConomy;
+import com.iConomy.iConomy;
 import java.lang.Math;
 import java.util.ArrayList;
 
@@ -623,7 +623,7 @@ public class MarketItem extends ItemClump {
             return ("{PRM}" + getName() + "{ERR} has only {PRM}"
                     + formatBundleCount(leftToBuy()) + " {ERR}left for sale.");
         // Display count as [<bundle>(x<numbundles>)]
-        return ("{}Buy: {BKT}[{PRM}" + formatBundleCount(numBundles) + "{BKT}]{} for {PRM}" + iConomy.getBank().format(getBuyPrice(numBundles)));
+        return ("{}Buy: {BKT}[{PRM}" + formatBundleCount(numBundles) + "{BKT}]{} for {PRM}" + iConomy.format(getBuyPrice(numBundles)));
         // TODO: Abstract currency name from iConomy reference.
     }
 
@@ -639,8 +639,7 @@ public class MarketItem extends ItemClump {
                     + formatBundleCount(leftToSell()) + " {ERR}can be sold.");
         // Display count as [<bundle>(x<numbundles>)]
         return ("{}Sell: {BKT}[{PRM}" + formatBundleCount(numBundles)
-                + "{BKT}]{} for {PRM}" + getSellPrice(numBundles) + " " + iConomy
-                .getBank().getCurrency());
+                + "{BKT}]{} for {PRM}" + iConomy.format(getSellPrice(numBundles)));
         // TODO: Abstract currency name from iConomy reference.
     }
 

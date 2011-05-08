@@ -1,7 +1,7 @@
 package com.gmail.haloinverse.DynamicMarket;
 
 import com.nijikokun.bukkit.Permissions.Permissions;
-import com.nijiko.coelho.iConomy.iConomy;
+import com.iConomy.*;
 import com.nijiko.permissions.PermissionHandler;
 
 import java.io.File;
@@ -29,13 +29,13 @@ public class DynamicMarket extends JavaPlugin {
     public iListen playerListener = new iListen(this);
 
     public static Server server = null;
-    public static iConomy iC = null;
+    public static iConomy economy = null;
     public static PermissionHandler Permissions = null;
     
     public static iProperty Settings;
     public static File directory = null;
 
-    protected static String currency;// = "Coin";
+    //protected static String currency;// = "Coin";
     protected static boolean econLoaded = false;
     
     public static boolean debug = false;
@@ -107,11 +107,11 @@ public class DynamicMarket extends JavaPlugin {
         sqlite = "jdbc:sqlite:" + directory + File.separator + "shop.db";
 
 	  	PluginManager pm = getServer().getPluginManager();
-	  	if(pm.getPlugin("iConomy").isEnabled() && DynamicMarket.iC == null) {
+	  	if(pm.getPlugin("iConomy").isEnabled() && DynamicMarket.economy == null) {
 	  		Plugin iConomy = pm.getPlugin("iConomy");
 	  		//iConomyData();	
 	  		setiConomy((iConomy)iConomy);
-	  		iC = (iConomy)iConomy;
+	  		iConomy = (iConomy)iConomy;
 	  	}
 	  	if(pm.getPlugin("Permissions").isEnabled() && DynamicMarket.Permissions == null) {
 	  		setupPermissions();
@@ -132,13 +132,13 @@ public class DynamicMarket extends JavaPlugin {
     }
     
     public static iConomy getiConomy() {
-        return iC;
+        return economy;
     }
 
     public static boolean setiConomy(iConomy plugin) {
-        if (iC == null) {
-            iC = plugin;
-            currency = iConomy.getBank().getCurrency();
+        if (economy == null) {
+            economy = plugin;
+            //currency = iConomy.getCurrency();
             econLoaded = true;
             log.info(Messaging.bracketize(name) + " iConomy connected.");   
         } else {
@@ -276,7 +276,6 @@ public class DynamicMarket extends JavaPlugin {
     }
 
     public void InitializeEconomy() {
-            currency = iConomy.getBank().getCurrency();
             econLoaded = true;
         log.info(Messaging.bracketize(name) + " successfully hooked into iConomy.");
     }
