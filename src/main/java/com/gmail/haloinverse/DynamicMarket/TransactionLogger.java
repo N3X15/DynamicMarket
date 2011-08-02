@@ -5,13 +5,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class TransactionLogger {
-
+    
     private BufferedWriter logWriter = null;
     private String logFileName;
     public boolean autoFlush;
     public boolean isOK;
-
-    public TransactionLogger(DynamicMarket thisPlugin, String fileName, boolean setAutoFlush) {
+    
+    public TransactionLogger(DynamicMarket thisPlugin, String fileName,
+            boolean setAutoFlush) {
         this.isOK = true;
         this.logFileName = fileName;
         this.autoFlush = setAutoFlush;
@@ -27,7 +28,7 @@ public class TransactionLogger {
             return;
         }
     }
-
+    
     public void logTransaction(String thisLine) {
         if (logWriter == null) {
             return;
@@ -43,7 +44,7 @@ public class TransactionLogger {
             isOK = false;
         }
     }
-
+    
     protected void finalize() {
         if (logWriter == null) {
             return;
@@ -59,7 +60,7 @@ public class TransactionLogger {
             logSevereException("Error closing logfile:" + logFileName, ex);
         }
     }
-
+    
     private void logSevereException(String exDesc, Exception exDetail) {
         DynamicMarket.log.severe("[" + DynamicMarket.name + "]: " + exDesc + ": " + exDetail);
     }

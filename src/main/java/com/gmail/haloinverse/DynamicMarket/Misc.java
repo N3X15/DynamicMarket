@@ -11,26 +11,23 @@ package com.gmail.haloinverse.DynamicMarket;
     public static String headerify(String innerText) {
         // TODO: Catch cases where a colour code ends up at the end of the line.
         // This is capable of crashing the client!
-        int extraLength = innerText.length()
-                - (stripCodes(Messaging.stripHighlights(innerText))).length();
-        String newString = "--"
-                + innerText
-                + "------------------------------------------------------------";
+        int extraLength = innerText.length() - (stripCodes(Messaging.stripHighlights(innerText))).length();
+        String newString = "--" + innerText + "------------------------------------------------------------";
         return newString.substring(0, 50 + extraLength);
         // This is approximate, due to inability to get string width of the proportional font.
     }
-
+    
     public static String stripCodes(String toStrip)
     // Removes color codes from the string.
     {
         return toStrip.replaceAll("&[a-z0-9]", "").replace("&&", "&");
     }
-
+    
     /*     */public static boolean isEither(String text, String against, String or)
     /*     */{
         /* 76 */return ((text.equalsIgnoreCase(against)) || (text.equalsIgnoreCase(or)));
         /*     */}
-
+    
     public static boolean isAny(String text, String[] against) {
         for (String thisAgainst : against) {
             if (text.equalsIgnoreCase(thisAgainst))
@@ -38,7 +35,7 @@ package com.gmail.haloinverse.DynamicMarket;
         }
         return false;
     }
-
+    
     /*     */
     // @Deprecated
     /*     */// public static String formatCurrency(int Balance, String currency)
@@ -130,7 +127,8 @@ package com.gmail.haloinverse.DynamicMarket;
     /*     */// }
     /*     */
 
-    /*     */public static String combineSplit(int startIndex, String[] string, String seperator) {
+    /*     */public static String combineSplit(int startIndex, String[] string,
+            String seperator) {
         /* 181 */StringBuilder builder = new StringBuilder();
         /*     */
         /* 183 */for (int i = startIndex; i < string.length; ++i) {
@@ -145,7 +143,5 @@ package com.gmail.haloinverse.DynamicMarket;
 }
 
 /*
- * Location: C:\Program Files\eclipse\Bukkit\SimpleShop.jar Qualified Name:
- * com.nijikokun.bukkit.SimpleShop.Misc Java Class Version: 5 (49.0) JD-Core
- * Version: 0.5.3
+ * Location: C:\Program Files\eclipse\Bukkit\SimpleShop.jar Qualified Name: com.nijikokun.bukkit.SimpleShop.Misc Java Class Version: 5 (49.0) JD-Core Version: 0.5.3
  */

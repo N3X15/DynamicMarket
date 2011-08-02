@@ -8,7 +8,7 @@
 	<repositories>
 		<repository>
 			<id>nexisonline-repo</id>
-			<url>http://ci.nexisonline.net:8080/nexus/content/groups/public/</url>
+			<url>http://repo.nexisonline.net:8080/nexus/content/groups/public/</url>
 		</repository>
 	</repositories>
 	<dependencies>
@@ -20,12 +20,12 @@
 		<dependency>
 			<groupId>com.nijikokun.bukkit</groupId>
 			<artifactId>Permissions</artifactId>
-			<version>2.7.3</version>
+			<version>3.1.6</version>
 		</dependency>
 		<dependency>
-			<groupId>com.nijikokun.bukkit</groupId>
+			<groupId>com.iConomy</groupId>
 			<artifactId>iConomy</artifactId>
-			<version>5.0</version>
+			<version>5.0.1</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -37,8 +37,8 @@
 				<version>2.3.2</version>
 				<configuration>
 					<sourceEncoding>UTF-8</sourceEncoding>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.5</source>
+					<target>1.5</target>
 					<encoding>UTF-8</encoding>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>

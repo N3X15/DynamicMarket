@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.sql.Statement;
 
 public class SQLHandler {
-
+    
     // A wrapper class to handle the repeated grunt-work of SQL queries and the errors they throw.
     public Connection conn;
     public PreparedStatement ps;
@@ -19,15 +19,16 @@ public class SQLHandler {
     public DatabaseCore connDB;
     public ArrayList<Object> inputList;
     public boolean isOK; // Default true, set to false when errors occur.
-
+    
     public SQLHandler(DatabaseCore thisDB) {
         isOK = true;
         inputList = new ArrayList<Object>();
         psList = new ArrayList<PreparedStatement>();
         connDB = thisDB;
-
+        
         try {
-            if ( DynamicMarket.debug ) DynamicMarket.log.info("SQLHandler constructor - trying connection to DB");            
+            if (DynamicMarket.debug)
+                DynamicMarket.log.info("SQLHandler constructor - trying connection to DB");
             conn = connDB.connection();
         } catch (ClassNotFoundException ex) {
             connDB.logSevereException("Database connector not found for " + connDB.dbTypeString(), ex);
@@ -42,9 +43,10 @@ public class SQLHandler {
         ps = null;
         rs = null;
     };
-
+    
     public void prepareStatement(String sqlString) {
-        if ( DynamicMarket.debug ) DynamicMarket.log.info("SQLHandler:prepareStatement(\""+sqlString+"\")");
+        if (DynamicMarket.debug)
+            DynamicMarket.log.info("SQLHandler:prepareStatement(\"" + sqlString + "\")");
         try {
             // Store previous prepareStatement, if one was already prepared.
             
@@ -73,7 +75,7 @@ public class SQLHandler {
             isOK = false;
         }
     }
-
+    
     public void prepareBatchStatement(String sqlString) {
         // Takes the sqlString, and creates a preparedStatement.
         // Unlike prepareStatement, this does NOT read the parameters already entered into inputList.
@@ -99,7 +101,7 @@ public class SQLHandler {
             isOK = false;
         }
     }
-
+    
     public void addToBatch() {
         // Add the current inputList to the current (batch)preparedStatement as a batch item.
         for (int i = 1; i <= inputList.size(); ++i) {
@@ -121,7 +123,7 @@ public class SQLHandler {
         }
         inputList.clear();
     }
-
+    
     public void executeQuery() {
         // Executes only the most recent preparedStatement, AND returns the result.
         // Clears the preparedStatement after use.
@@ -129,36 +131,37 @@ public class SQLHandler {
             rs = null;
             if (ps != null) {
                 rs = ps.executeQuery();
-                if ( DynamicMarket.debug ) {
+                if (DynamicMarket.debug) {
                     DynamicMarket.log.info("ps.executeQuery() called");
                     SQLWarning sw = rs.getWarnings();
-                    while ( sw != null ) {
+                    while (sw != null) {
                         DynamicMarket.log.info(sw.getMessage());
                         sw = sw.getNextWarning();
                     }
                     sw = ps.getWarnings();
-                    while ( sw != null ) {
+                    while (sw != null) {
                         DynamicMarket.log.info(sw.getMessage());
                         sw = sw.getNextWarning();
                     }
                 }
-
-                if (!conn.getAutoCommit()) conn.commit();
+                
+                if (!conn.getAutoCommit())
+                    conn.commit();
             }
         } catch (SQLException ex) {
             connDB.logSevereException("Error executing query statement [" + ps.toString() + "] with " + connDB.dbTypeString(), ex);
             ex.printStackTrace();
             
             try {
-                connDB.logSevereException("PreparedStatement status: " + (ps.isClosed()?"closed":"open"));
-            } catch ( SQLException ex2) {
+                connDB.logSevereException("PreparedStatement status: " + (ps.isClosed() ? "closed" : "open"));
+            } catch (SQLException ex2) {
                 connDB.logSevereException("Error checking PreparedStatement status: " + ex2);
                 ex2.printStackTrace();
             }
-
+            
             try {
-                connDB.logSevereException("Connection status: " + (ps.getConnection().isClosed()?"closed":"open"));
-            } catch ( SQLException ex2) {
+                connDB.logSevereException("Connection status: " + (ps.getConnection().isClosed() ? "closed" : "open"));
+            } catch (SQLException ex2) {
                 connDB.logSevereException("Error checking connection status: " + ex2);
                 ex2.printStackTrace();
             }
@@ -170,7 +173,7 @@ public class SQLHandler {
         ps = null;
         
     }
-
+    
     public void executeUpdates() {
         // Executes all currently loaded preparedStatements.
         try {
@@ -197,14 +200,15 @@ public class SQLHandler {
             isOK = false;
         }
     }
-
+    
     public void executeStatement(String sqlStatement) {
         Statement st = null;
         if (conn != null) {
             try {
                 st = conn.createStatement();
                 st.executeUpdate(sqlStatement);
-                if (!conn.getAutoCommit()) conn.commit();
+                if (!conn.getAutoCommit())
+                    conn.commit();
             } catch (SQLException ex) {
                 connDB.logSevereException("Error executing statement [" + sqlStatement + "] with " + connDB.dbTypeString(), ex);
                 isOK = false;
@@ -220,7 +224,7 @@ public class SQLHandler {
             }
         }
     }
-
+    
     public boolean checkTable(String tableName) {
         boolean bool = false;
         if (conn != null) {
@@ -238,7 +242,7 @@ public class SQLHandler {
         }
         return bool;
     }
-
+    
     public boolean checkColumnExists(String tableName, String columnName) {
         boolean bool = false;
         if (conn != null) {
@@ -256,7 +260,7 @@ public class SQLHandler {
         }
         return bool;
     }
-
+    
     public int getInt(String fieldName) {
         try {
             return rs.getInt(fieldName);
@@ -266,7 +270,7 @@ public class SQLHandler {
             return 0;
         }
     }
-
+    
     public String getString(String fieldName) {
         try {
             return rs.getString(fieldName);
@@ -276,7 +280,7 @@ public class SQLHandler {
             return null;
         }
     }
-
+    
     public void close() {
         if (rs != null) {
             try {
@@ -295,18 +299,17 @@ public class SQLHandler {
             }
         }
         
-//        if (conn != null) {
-//            try {
-//                conn.close();
-//            } catch (SQLException ex) {
-//                connDB.logSevereException("SQL error closing connection for " + connDB.dbTypeString() + "database", ex);
-//                isOK = false;
-//            }
-//        }
+        //        if (conn != null) {
+        //            try {
+        //                conn.close();
+        //            } catch (SQLException ex) {
+        //                connDB.logSevereException("SQL error closing connection for " + connDB.dbTypeString() + "database", ex);
+        //                isOK = false;
+        //            }
+        //        }
         
-
     }
-
+    
     protected void finalize() throws Throwable {
         // Just in case close() doesn't get called...
         try {
