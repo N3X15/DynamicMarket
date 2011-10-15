@@ -1,8 +1,8 @@
 package com.gmail.haloinverse.DynamicMarket;
 
-import com.iConomy.iConomy;
-import java.lang.Math;
 import java.util.ArrayList;
+
+import com.iConomy.iConomy;
 
 //import java.sql.ResultSet;
 
@@ -647,14 +647,14 @@ public class MarketItem extends ItemClump {
     }
     
     public String infoStringShort() {
-        return ("{BKT}[{}" + itemId + (subType != 0 ? "," + subType : "") + "{BKT}]{} " + getName() + "{BKT}[{}" + count + "{BKT}]{} Buy:{BKT}[{}" + (getCanBuy(1) ? getBuyPrice(1) : "-") + "{BKT}]{} Sell:{BKT}[{}" + (getCanSell(1) ? getSellPrice(1) : "-") + "{BKT}]");
+        return ("{BKT}[{}" + itemId + (subType != ItemClump.NIL ? "," + subType : "") + "{BKT}]{} " + getName() + "{BKT}[{}" + count + "{BKT}]{} Buy:{BKT}[{}" + (getCanBuy(1) ? getBuyPrice(1) : "-") + "{BKT}]{} Sell:{BKT}[{}" + (getCanSell(1) ? getSellPrice(1) : "-") + "{BKT}]");
     }
     
     public ArrayList<String> infoStringFull() {
         // More detailed info, more useful to shop admins.
         // Switch to select line number?
         ArrayList<String> returnList = new ArrayList<String>();
-        returnList.add("{}ID:{BKT}[{PRM}" + itemId + (subType != 0 ? "," + subType : "") + "{BKT}]{} Name:{PRM}" + getName() + "{} BundleSize:{BKT}[{PRM}" + count + "{BKT}]");
+        returnList.add("{}ID:{BKT}[{PRM}" + itemId + (subType != ItemClump.NIL ? "," + subType : "") + "{BKT}]{} Name:{PRM}" + getName() + "{} BundleSize:{BKT}[{PRM}" + count + "{BKT}]");
         returnList.add("{}BasePrice:{BKT}[{PRM}" + basePrice + "{BKT}]{} SalesTax:{BKT}[{PRM}" + salesTax + "{BKT}]{} Vol:{BKT}[{PRM}" + volatility + "{BKT}]{} IVol:{BKT}[{PRM}" + getInverseVolatility() + "{BKT}]");
         returnList.add("{}Stock:{BKT}[{PRM}" + stock + "{BKT}]{} CanBuy:{BKT}[{PRM}" + (getCanBuy(1) ? getBuyPrice(1) : "-") + "{BKT}]{} CanSell:{BKT}[{PRM}" + (getCanSell(1) ? getSellPrice(1) : "-") + "{BKT}]");
         returnList.add("{}StockLowest:{BKT}[{PRM}" + intFormat(stockLowest) + "{BKT}]{} StockHighest:{BKT}[{PRM}" + intFormat(stockHighest) + "{BKT}]");

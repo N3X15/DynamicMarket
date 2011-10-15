@@ -3,6 +3,7 @@ package com.gmail.haloinverse.DynamicMarket;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +14,12 @@ public class Items {
     private HashMap<String, String> itemsData;
     private iProperty ItemsFile;
     
+    public Items(DynamicMarket plugin) {
+        
+    }
+    
     public Items(String itemFileName, DynamicMarket thisPlugin) {
+        
         // TODO: Handle cases where the plugin loads, but items.db doesn't.
         // TODO: Add user command for reloading items.db.
         // TODO: Make item file format more generic.
@@ -21,6 +27,8 @@ public class Items {
         // Following code originally in setupItems from SimpleShop
         Map<String, String> mappedItems = null;
         itemsData = new HashMap<String, String>();
+        
+        PreloadItems();
         
         try {
             mappedItems = ItemsFile.returnMap();
@@ -40,6 +48,19 @@ public class Items {
         }
     }
     
+    private void PreloadItems() {
+        for (Material mat : Material.values()) {
+            String itemID = mat.getId() + "";
+            if (mat.getMaxDurability() > 0) {
+                for (int d = 0; d < mat.getMaxDurability() + 1; d++) {
+                    itemsData.put(itemID + "," + d, mat.name() + "," + d);
+                }
+            } else {
+                itemsData.put(itemID, mat.name());
+            }
+        }
+    }
+    
     public String name(String idString) {
         if (itemsData.containsKey(idString)) {
             return ((String) itemsData.get(idString));
@@ -53,7 +74,7 @@ public class Items {
     
     public String name(ItemClump itemData) {
         // Fetches the item name given an ItemClump.
-        return name(Integer.toString(itemData.itemId) + (itemData.subType != 0 ? "," + Integer.toString(itemData.subType) : ""));
+        return name(Integer.toString(itemData.itemId) + (itemData.subType != ItemClump.NIL ? "," + Integer.toString(itemData.subType) : ""));
     }
     
     public void setName(String id, String name) {
@@ -71,7 +92,7 @@ public class Items {
         int amount = 0;
         
         for (ItemStack item : items) {
-            if ((item != null) && (item.getTypeId() == scanItem.itemId) && (item.getDurability() == (byte) scanItem.subType)) {
+            if ((item != null) && (item.getTypeId() == scanItem.itemId) && (scanItem.subType == ItemClump.NIL || item.getDurability() == (byte) scanItem.subType)) {
                 amount += item.getAmount();
             }
         }
@@ -94,7 +115,7 @@ public class Items {
         
         for (int invSlot = 35; (invSlot >= 0) && (toRemove > 0); --invSlot) {
             thisItem = items[invSlot];
-            if ((items[invSlot] != null) && (thisItem.getTypeId() == item.itemId) && (thisItem.getDurability() == (byte) item.subType)) {
+            if ((items[invSlot] != null) && (thisItem.getTypeId() == item.itemId) && (item.subType == ItemClump.NIL || thisItem.getDurability() == (byte) item.subType)) {
                 toRemove -= thisItem.getAmount();
                 inventory.clear(invSlot);
             }
@@ -102,7 +123,7 @@ public class Items {
         
         if (toRemove < 0) // removed too many! put some back!
         {
-            inventory.addItem(new ItemStack[] { new ItemStack(item.itemId, -toRemove, (byte) item.subType) });
+            inventory.addItem(new ItemStack[] { new ItemStack(item.itemId, -toRemove, (byte) ((item.subType == ItemClump.NIL) ? 0 : item.subType)) });
         }
     }
     

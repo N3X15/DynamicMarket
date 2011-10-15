@@ -1,5 +1,8 @@
 package com.gmail.haloinverse.DynamicMarket;
 
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
 public class ItemClump {
     
     // Implemented because bukkit's ItemStack methods don't handle item subtypes consistently.
@@ -10,11 +13,12 @@ public class ItemClump {
     public int itemId; // id of item
     public int subType; // Subtype of item (i.e. dye colour); 0 if undamaged single-typed item.
     public int count; // Number of items in this clump.
+    public static int NIL = -1;
     
     public ItemClump() {
         // Default constructor with no parameters.
         itemId = -1;
-        subType = 0;
+        subType = NIL;
         count = 1;
     }
     
@@ -31,6 +35,11 @@ public class ItemClump {
     }
     
     public ItemClump(String initString, DatabaseMarket namesDB, String shopLabel) {
+        this(initString, namesDB, shopLabel, null);
+    }
+    
+    public ItemClump(String initString, DatabaseMarket namesDB,
+            String shopLabel, Player player) {
         // Valid input string formats:
         // "[ID(,Type)](:Count) (ignored)"
         // "[ItemName](:Count) (ignored)"
@@ -41,10 +50,13 @@ public class ItemClump {
         String[] idData;
         String[] initData = initString.split(" ");
         boolean subtypeParsed = false;
-        
+        boolean getAll = false;
         if (initData[0].contains(":")) {
             // Count detected. Pull it out, if it's valid.
             idData = initData[0].split(":");
+            if (idData[1].equalsIgnoreCase("all")) {
+                getAll = true;
+            }
             try {
                 count = Integer.valueOf(idData[1]).intValue();
             } catch (NumberFormatException e) {
@@ -73,7 +85,7 @@ public class ItemClump {
             // It's trying to be a name. Find it.
             if (initData[0].equalsIgnoreCase("default")) {
                 itemId = -1;
-                subType = -1;
+                subType = NIL;
             } else {
                 if (namesDB != null) {
                     ItemClump foundItem = namesDB.nameLookup(initData[0], shopLabel);
@@ -87,13 +99,25 @@ public class ItemClump {
             }
         }
         
+        if (player != null && getAll) {
+            count = 0;
+            for (ItemStack is : player.getInventory().all(itemId).values()) {
+                if (subType == NIL || is.getDurability() == subType) {
+                    count += is.getAmount();
+                }
+            }
+        }
+        
+        if (subType < 0)
+            subType = 0;
+        
         if (count < 1) {
             count = 1;
         }
     }
     
     public String idString() {
-        return String.valueOf(itemId) + (subType == 0 ? "" : "," + String.valueOf(subType));
+        return String.valueOf(itemId) + (subType == NIL ? "" : "," + String.valueOf(subType));
     }
     
     public String getName(DatabaseMarket namesDB, String shopLabel) {

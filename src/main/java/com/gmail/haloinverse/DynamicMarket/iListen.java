@@ -1,19 +1,17 @@
 package com.gmail.haloinverse.DynamicMarket;
 
-import com.gmail.haloinverse.DynamicMarket.DynamicMarket.EconType;
-
-//import com.haloinverse.AnyConomy.Exceptions.*;
-
-import com.nijikokun.bukkit.Permissions.Permissions;
-import com.iConomy.iConomy;
-import com.iConomy.system.Account;
 import java.util.ArrayList;
-//import org.bukkit.command.Command;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.inventory.ItemStack;
+
+import com.gmail.haloinverse.DynamicMarket.DynamicMarket.EconType;
+import com.iConomy.iConomy;
+import com.iConomy.system.Account;
+import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class iListen extends PlayerListener {
     
@@ -449,7 +447,7 @@ public class iListen extends PlayerListener {
         // TODO: check aren's source - oddly different here
         
         // TODO: Check for sufficient inventory space for received items.
-        ItemClump requested = new ItemClump(itemString, plugin.db, shopLabel);
+        ItemClump requested = new ItemClump(itemString, plugin.db, shopLabel, player);
         Messaging message = new Messaging(player);
         
         int balance = get_balance(player.getName());
@@ -528,7 +526,7 @@ public class iListen extends PlayerListener {
             String shopLabel, String accountName, boolean freeAccount) {
         // TODO: check aren's source different here
         
-        ItemClump requested = new ItemClump(itemString, plugin.db, shopLabel);
+        ItemClump requested = new ItemClump(itemString, plugin.db, shopLabel, player);
         Messaging message = new Messaging(player);
         
         int transValue;
@@ -556,7 +554,7 @@ public class iListen extends PlayerListener {
             return true;
         }
         
-        if ((requested.count < 1) || (requested.count * data.count > plugin.max_per_sale)) {
+        if ((requested.count < 1) /* || (requested.count * data.count > plugin.max_per_sale) */) {
             message.send(plugin.shop_tag + "{ERR}Amount over max items per sale.");
             return true;
         }
@@ -819,13 +817,6 @@ public class iListen extends PlayerListener {
             String subCommand = args[0];
             
             if ((args.length == 1) && (subCommand.equalsIgnoreCase("debug"))) {
-                //                SQLHandler a = new SQLHandler(plugin.db);
-                //                message.send("checkTable: " + (a.checkTable("Market")?"true":"false"));
-                //                plugin.db.uninitialize();
-                //                plugin.db.initialize();
-                ////                message.send("checkTable: " + (a.checkTable("Market")?"true":"false"));
-                //                SQLHandler b = new SQLHandler(plugin.db);
-                //                message.send("checkTable: " + (b.checkTable("Market")?"true":"false"));
                 return true;
             }
             
