@@ -1,14 +1,12 @@
 package com.gmail.haloinverse.DynamicMarket;
 
-import com.nijikokun.bukkit.Permissions.Permissions;
-import com.iConomy.*;
-import com.nijiko.permissions.PermissionHandler;
-
 import java.io.File;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Timer;
 import java.util.logging.Logger;
+
+import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event;
@@ -17,7 +15,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.Server;
+
+import com.iConomy.iConomy;
 
 public class DynamicMarket extends JavaPlugin {
     public static final Logger log = Logger.getLogger("Minecraft");
@@ -30,7 +29,6 @@ public class DynamicMarket extends JavaPlugin {
     
     public static Server server = null;
     public static iConomy economy = null;
-    public static PermissionHandler Permissions = null;
     
     public static iProperty Settings;
     public static File directory = null;
@@ -91,7 +89,6 @@ public class DynamicMarket extends JavaPlugin {
         return directory;
     }
     
-    @Override
     public void onEnable() {
         PluginDescriptionFile desc = getDescription();
         getDataFolder().mkdir();
@@ -109,10 +106,6 @@ public class DynamicMarket extends JavaPlugin {
             //iConomyData();	
             setiConomy((iConomy) iConomy);
             iConomy = (iConomy) iConomy;
-        }
-        if (pm.getPlugin("Permissions").isEnabled() && DynamicMarket.Permissions == null) {
-            setupPermissions();
-            System.out.println("[DynamicMarket] Successfully linked with Permissions.");
         }
         pluginListener = new iPluginListener();
         pm.registerEvent(Event.Type.PLUGIN_ENABLE, pluginListener, Priority.Monitor, this);
@@ -141,14 +134,6 @@ public class DynamicMarket extends JavaPlugin {
             return false;
         }
         return true;
-    }
-    
-    public static void setupPermissions() {
-        Plugin test = getTheServer().getPluginManager().getPlugin("Permissions");
-        if (Permissions == null)
-            if (test != null)
-                DynamicMarket.Permissions = ((Permissions) test).getHandler();
-        
     }
     
     private void checkLibs() {

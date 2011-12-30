@@ -1,11 +1,11 @@
 package com.gmail.haloinverse.DynamicMarket;
 
-import com.iConomy.iConomy;
-
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerListener;
 import org.bukkit.plugin.Plugin;
+
+import com.iConomy.iConomy;
 
 /**
  * iPluginListener Allows us to hook into permissions even if it is loaded later on.
@@ -38,16 +38,6 @@ public class iPluginListener extends ServerListener {
                     DynamicMarket.setiConomy((iConomy) iConomy);
                 }
                 System.out.println("[DynamicMarket] hooked into iConomy.");
-            }
-        }
-        
-        if (event.getPlugin().getDescription().getName().equals("Permissions")) {
-            if (DynamicMarket.Permissions == null) {
-                Plugin Permissions = DynamicMarket.getTheServer().getPluginManager().getPlugin("Permissions");
-                if (Permissions != null) {
-                    DynamicMarket.setupPermissions();
-                    System.out.println("[DynamicMarket] Successfully linked with Permissions.");
-                }
             }
         }
     }

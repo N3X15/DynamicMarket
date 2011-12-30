@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import com.gmail.haloinverse.DynamicMarket.DynamicMarket.EconType;
 import com.iConomy.iConomy;
 import com.iConomy.system.Account;
-import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class iListen extends PlayerListener {
     
@@ -22,31 +21,33 @@ public class iListen extends PlayerListener {
     }
     
     public boolean hasPermission(CommandSender sender, String permString) {
-        //TODO: check this if - looks wrong....
-        if (DynamicMarket.simplePermissions || DynamicMarket.Permissions == null) {
-            DynamicMarket.log.info("[DynamicMarket] - Null Permission Detected when attempting command.");
-            if (sender instanceof Player) {
-                if (Misc.isAny(permString, new String[] { "access", "buy", "sell" })) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return true;
-            }
-        }
-        if (DynamicMarket.wrapperPermissions) {
-            if (plugin.permissionWrapper != null) {
-                return plugin.permissionWrapper.permission(sender, permString);
-            }
-            DynamicMarket.log.severe(Messaging.bracketize(DynamicMarket.name) + "WARNING: wrapper-permissions set, but no permission handler registered!");
-            return false;
-        }
-        // Permissions not overridden.
-        if (sender instanceof Player) {
-            return Permissions.Security.permission((Player) sender, DynamicMarket.name.toLowerCase() + "." + permString);
-        }
-        return true;
+        return sender.hasPermission(DynamicMarket.name.toLowerCase() + "." + permString);
+        
+        //TODO: check this if - looks wrong.... 
+        //        if (DynamicMarket.simplePermissions || DynamicMarket.Permissions == null) {
+        //            DynamicMarket.log.info("[DynamicMarket] - Null Permission Detected when attempting command.");
+        //            if (sender instanceof Player) {
+        //                if (Misc.isAny(permString, new String[] { "access", "buy", "sell" })) {
+        //                    return true;
+        //                } else {
+        //                    return false;
+        //                }
+        //            } else {
+        //                return true;
+        //            }
+        //        }
+        //        if (DynamicMarket.wrapperPermissions) {
+        //            if (plugin.permissionWrapper != null) {
+        //                return plugin.permissionWrapper.permission(sender, permString);
+        //            }
+        //            DynamicMarket.log.severe(Messaging.bracketize(DynamicMarket.name) + "WARNING: wrapper-permissions set, but no permission handler registered!");
+        //            return false;
+        //        } // Permissions not overridden. 
+        //        if (sender instanceof Player) {
+        //            return Permissions.Security.permission((Player) sender, DynamicMarket.name.toLowerCase() + "." + permString);
+        //        }
+        //        return true;
+        
     }
     
     private boolean showHelp(CommandSender sender, String topic) {
@@ -515,11 +516,6 @@ public class iListen extends PlayerListener {
     private String getCurrencyNamePlural() {
         // TODO Auto-generated method stub
         return com.iConomy.util.Constants.Major.get(1);
-    }
-    
-    private String getCurrencyName() {
-        // TODO Auto-generated method stub
-        return com.iConomy.util.Constants.Major.get(0);
     }
     
     private boolean shopSellItem(Player player, String itemString,
