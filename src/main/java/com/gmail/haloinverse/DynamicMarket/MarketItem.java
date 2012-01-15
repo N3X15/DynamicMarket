@@ -71,8 +71,7 @@ public class MarketItem extends ItemClump {
         setBaseDefaults();
     }
     
-    public MarketItem(String initString, MarketItem defaults,
-            DatabaseMarket thisDB, String thisShopLabel) {
+    public MarketItem(String initString, MarketItem defaults, DatabaseMarket thisDB, String thisShopLabel) {
         // Valid input string formats:
         // "[ID(,Type)](:Count) (buyprice (sellPrice)) (field:val (field:val (...)))"
         // "[ItemName](:Count) (buyprice (sellPrice)) (field:val (field:val (...)))"
@@ -701,8 +700,7 @@ public class MarketItem extends ItemClump {
         }
     }
     
-    public MarketItem(String csvString, MarketItem defaults, String shopLabel,
-            boolean isCSV) {
+    public MarketItem(String csvString, MarketItem defaults, String shopLabel, boolean isCSV) {
         super();
         
         if (defaults != null) {

@@ -1,13 +1,17 @@
 package com.gmail.haloinverse.DynamicMarket;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class FileDownloader {
     final static int size = 1024;
     
-    public static boolean FileDownload(String fileAddress,
-            String localFileName, String destinationDir) {
+    public static boolean FileDownload(String fileAddress, String localFileName, String destinationDir) {
         OutputStream os = null;
         URLConnection URLConn = null;
         
@@ -18,7 +22,7 @@ public class FileDownloader {
         try {
             URL fileUrl;
             byte[] buf;
-            int ByteRead, ByteWritten = 0;
+            int ByteRead;
             fileUrl = new URL(fileAddress);
             os = new BufferedOutputStream(new FileOutputStream(destinationDir + "/" + localFileName));
             //The URLConnection object is created by invoking the	
@@ -29,7 +33,6 @@ public class FileDownloader {
             buf = new byte[size];
             while ((ByteRead = is.read(buf)) != -1) {
                 os.write(buf, 0, ByteRead);
-                ByteWritten += ByteRead;
             }
             
             return true;

@@ -413,8 +413,7 @@ public class iListen extends PlayerListener {
         }
     }
     
-    private boolean shopShowItemInfo(String itemString, Messaging message,
-            boolean fullInfo, String shopLabel) {
+    private boolean shopShowItemInfo(String itemString, Messaging message, boolean fullInfo, String shopLabel) {
         ItemClump requested = new ItemClump(itemString, plugin.db, shopLabel);
         
         if (!requested.isValid()) {
@@ -443,8 +442,7 @@ public class iListen extends PlayerListener {
         return true;
     }
     
-    private boolean shopBuyItem(Player player, String itemString,
-            String shopLabel, String accountName) {
+    private boolean shopBuyItem(Player player, String itemString, String shopLabel, String accountName) {
         // TODO: check aren's source - oddly different here
         
         // TODO: Check for sufficient inventory space for received items.
@@ -474,7 +472,7 @@ public class iListen extends PlayerListener {
         }
         
         if (!data.canBuy) {
-            message.send(plugin.shop_tag + "{ERR}" + data.getName() + " currently not purchaseable from shop.");
+            message.send(plugin.shop_tag + "{ERR}" + data.getName() + " currently not purchasable from shop.");
             return true;
         }
         
@@ -518,8 +516,7 @@ public class iListen extends PlayerListener {
         return com.iConomy.util.Constants.Major.get(1);
     }
     
-    private boolean shopSellItem(Player player, String itemString,
-            String shopLabel, String accountName, boolean freeAccount) {
+    private boolean shopSellItem(Player player, String itemString, String shopLabel, String accountName, boolean freeAccount) {
         // TODO: check aren's source different here
         
         ItemClump requested = new ItemClump(itemString, plugin.db, shopLabel, player);
@@ -589,8 +586,7 @@ public class iListen extends PlayerListener {
         return true;
     }
     
-    private boolean shopAddItem(String itemString, Messaging message,
-            String shopLabel) {
+    private boolean shopAddItem(String itemString, Messaging message, String shopLabel) {
         MarketItem newItem = new MarketItem(itemString, plugin.db.getDefault(shopLabel), plugin.db, shopLabel);
         
         if (!newItem.isValid()) {
@@ -624,8 +620,7 @@ public class iListen extends PlayerListener {
         }
     }
     
-    private boolean shopUpdateItem(String itemStringIn, Messaging message,
-            String shopLabel) {
+    private boolean shopUpdateItem(String itemStringIn, Messaging message, String shopLabel) {
         // Make a copy of itemStringIn, in case modification is needed.
         String itemString = new String(itemStringIn);
         
@@ -702,8 +697,7 @@ public class iListen extends PlayerListener {
         }
     }
     
-    private boolean shopRemoveItem(String itemString, Messaging message,
-            String shopLabel) {
+    private boolean shopRemoveItem(String itemString, Messaging message, String shopLabel) {
         ItemClump removed = new ItemClump(itemString, plugin.db, shopLabel);
         String removedItemName = null;
         
@@ -733,8 +727,7 @@ public class iListen extends PlayerListener {
         }
     }
     
-    public boolean shopReset(CommandSender sender, String confirmString,
-            String shopLabel) {
+    public boolean shopReset(CommandSender sender, String confirmString, String shopLabel) {
         Messaging message = new Messaging(sender);
         if (confirmString.isEmpty()) {
             message.send("{ERR} Warning!{} This will DELETE AND REBUILD the shop DB.");
@@ -779,14 +772,11 @@ public class iListen extends PlayerListener {
         }
     }
     
-    public boolean onCommand(CommandSender sender, String cmd,
-            String commandLabel, String[] args, String shopLabel) {
+    public boolean onCommand(CommandSender sender, String cmd, String commandLabel, String[] args, String shopLabel) {
         return parseCommand(sender, cmd, args, shopLabel, "", true);
     }
     
-    public boolean parseCommand(CommandSender sender, String cmd,
-            String[] args, String shopLabel, String accountName,
-            boolean freeAccount) {
+    public boolean parseCommand(CommandSender sender, String cmd, String[] args, String shopLabel, String accountName, boolean freeAccount) {
         // String commandName = cmd.getName().toLowerCase();
         
         // TODO: Show helpful errors for inappropriate numbers of arguments.
