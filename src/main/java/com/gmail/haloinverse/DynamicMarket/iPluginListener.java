@@ -1,8 +1,10 @@
 package com.gmail.haloinverse.DynamicMarket;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.event.server.ServerListener;
 import org.bukkit.plugin.Plugin;
 
 import com.iConomy.iConomy;
@@ -14,11 +16,11 @@ import com.iConomy.iConomy;
  * 
  * @author Nijikokun
  */
-public class iPluginListener extends ServerListener {
+public class iPluginListener implements Listener {
     public iPluginListener() {
     }
     
-    @Override
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPluginDisable(PluginDisableEvent event) {
         if (DynamicMarket.economy != null) {
             if (event.getPlugin().getDescription().getName().equals("iConomy")) {
@@ -28,7 +30,7 @@ public class iPluginListener extends ServerListener {
         }
     }
     
-    @Override
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPluginEnable(PluginEnableEvent event) {
         Plugin iConomy = event.getPlugin().getServer().getPluginManager().getPlugin("iConomy");
         

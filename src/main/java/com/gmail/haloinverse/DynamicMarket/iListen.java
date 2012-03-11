@@ -4,15 +4,17 @@ import java.util.ArrayList;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.inventory.ItemStack;
 
 import com.gmail.haloinverse.DynamicMarket.DynamicMarket.EconType;
 import com.iConomy.iConomy;
 import com.iConomy.system.Account;
 
-public class iListen extends PlayerListener {
+public class iListen implements Listener {
     
     public static DynamicMarket plugin;
     
@@ -747,6 +749,7 @@ public class iListen extends PlayerListener {
         return true;
     }
     
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerCommand(PlayerChatEvent event) {
         String base;
         String[] args;

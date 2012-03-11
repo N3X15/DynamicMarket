@@ -9,8 +9,6 @@ import java.util.logging.Logger;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -68,7 +66,7 @@ public class DynamicMarket extends JavaPlugin {
     protected TransactionLogger transLog = null;
     protected String transLogFile = "transactions.log";
     protected boolean transLogAutoFlush = true;
-    private static iPluginListener pluginListener = null;
+    private static iPluginListener pluginListener;
     
     public void onDisable() {
         //        db.uninitialize();
@@ -108,7 +106,7 @@ public class DynamicMarket extends JavaPlugin {
             iConomy = (iConomy) iConomy;
         }
         pluginListener = new iPluginListener();
-        pm.registerEvent(Event.Type.PLUGIN_ENABLE, pluginListener, Priority.Monitor, this);
+        pm.registerEvents(pluginListener, this);
         
         checkLibs();
         setup();
@@ -159,8 +157,7 @@ public class DynamicMarket extends JavaPlugin {
     }
     
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd,
-            String commandLabel, String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         ListIterator<JavaPlugin> itr = DynamicMarket.wrappers.listIterator();
         while (itr.hasNext()) {
             JavaPlugin wrap = itr.next();
@@ -175,19 +172,15 @@ public class DynamicMarket extends JavaPlugin {
         log.info(Messaging.bracketize(name) + " wrapper mode enabled by " + wrap.getDescription().getName());
     }
     
-    public boolean wrapperCommand(CommandSender sender, String cmd,
-            String[] args, String shopLabel, String accountName,
-            boolean freeAccount) {
+    public boolean wrapperCommand(CommandSender sender, String cmd, String[] args, String shopLabel, String accountName, boolean freeAccount) {
         return this.playerListener.parseCommand(sender, cmd, args, (shopLabel == null ? "" : shopLabel), accountName, freeAccount);
     }
     
-    public boolean wrapperCommand(CommandSender sender, String cmd,
-            String[] args, String shopLabel) {
+    public boolean wrapperCommand(CommandSender sender, String cmd, String[] args, String shopLabel) {
         return wrapperCommand(sender, cmd, args, (shopLabel == null ? "" : shopLabel), defaultShopAccount, defaultShopAccountFree);
     }
     
-    public boolean wrapperCommand(CommandSender sender, String cmd,
-            String[] args) {
+    public boolean wrapperCommand(CommandSender sender, String cmd, String[] args) {
         return wrapperCommand(sender, cmd, args, "");
     }
     
